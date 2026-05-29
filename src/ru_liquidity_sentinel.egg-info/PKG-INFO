@@ -1,0 +1,347 @@
+Metadata-Version: 2.4
+Name: ru-liquidity-sentinel
+Version: 0.1.0
+Summary: Liquidity Stress Index pipeline for the Russian money market (PSB Treasury).
+Author: ImPaul
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+Requires-Dist: pandas>=2.0
+Requires-Dist: numpy>=1.24
+Requires-Dist: scipy>=1.10
+Requires-Dist: scikit-learn>=1.3
+Requires-Dist: matplotlib>=3.7
+Requires-Dist: pyarrow>=14.0
+Provides-Extra: dashboard
+Requires-Dist: streamlit>=1.30; extra == "dashboard"
+Requires-Dist: altair>=5.0; extra == "dashboard"
+Requires-Dist: seaborn>=0.13; extra == "dashboard"
+Provides-Extra: models
+Requires-Dist: lightgbm>=4.0; extra == "models"
+Requires-Dist: shap>=0.44; extra == "models"
+Provides-Extra: dev
+Requires-Dist: pytest>=7.4; extra == "dev"
+Requires-Dist: pytest-cov>=4.1; extra == "dev"
+Requires-Dist: ruff>=0.4; extra == "dev"
+Requires-Dist: lightgbm>=4.0; extra == "dev"
+Requires-Dist: shap>=0.44; extra == "dev"
+
+# RU Liquidity Sentinel
+
+Прототип системы раннего предупреждения стресса ликвидности рублёвого
+денежного рынка для Казначейства ПСБ.  Реализует пять модулей сигналов
+(M1–M5) **по ТЗ** (`mad_score` + бинарные флаги + `MIO CUSUM` для
+каждого модуля), агрегацию в **Liquidity Stress Index (LSI, 0–100)**
+через **LightGBM + SHAP**, backtest на исторических эпизодах и
+Streamlit-дашборд.
+
+Репозиторий состоит из **двух слоёв**:
+
+* **`parsers/`** — сбор сырых данных из открытых источников (ЦБ РФ,
+  Минфин, Росказна, ФНС).  Отдельный Python-пакет
+  (`ru_liquidity_sentinel_parsers`) со своими зависимостями
+  (`parsers/requirements.txt`).  CLI-скрипты `fetch_m{1..5}.py` и
+  `fetch_all.py` пишут CSV в `parsers/data/processed/`.
+* **`src/ru_liquidity_sentinel/`** — аналитический пайплайн: фичи,
+  LightGBM + SHAP, бэктест, дашборд.  Читает CSV из `data/raw/`.
+
+Объединяющий скрипт **`scripts/fetch_and_run.py`** запускает оба слоя
+end-to-end: вызывает парсеры → копирует CSV → обучает модель →
+генерирует отчёты.
+
+## Архитектура
+
+| Слой | Файл/каталог | Что делает |
+| --- | --- | --- |
+| **Парсеры данных** | `parsers/` | Отдельный пакет `ru_liquidity_sentinel_parsers` со скриптами `fetch_m{1..5}.py` и `fetch_all.py`.  Качает ЦБ / Минфин / Росказна / ФНС, пишет CSV в `parsers/data/processed/`.  Свои зависимости в `parsers/requirements.txt`. |
+| **Объединяющий launcher** | `scripts/fetch_and_run.py` + `Makefile` | Один entry-point: парсеры → копирование CSV → пайплайн → отчёты. |
+| Конфиг | `src/ru_liquidity_sentinel/config.py` | Окно MAD (3 года), пороги статусов LSI (40/70), эпизоды для бэктеста.  Веса модулей **не используются** — LSI ≠ взвешенная сумма. |
+| Загрузка | `src/ru_liquidity_sentinel/loaders.py` | Тонкие обёртки над `pd.read_csv` — нормализуют типы и даты. |
+| Нормализация | `src/ru_liquidity_sentinel/normalize.py` | Скользящий MAD-z-score, конвертер в 0–100, **`winsorize_rolling`** для heavy-tail сигналов, **`RobustOnlineCUSUM`** (MIO) — каузальный CUSUM на робастных метриках. |
+| М1 — резервы + RUONIA | `modules/m1_reserves.py` | `mad_spread`, `mad_ruonia_spread`, `flag_end_of_period`, `mio_cusum`. |
+| М2 — репо ЦБ | `modules/m2_repo.py` | `mad_volume`, `mad_rate_spread`, `flag_high_demand`, `flag_fine_tuning`, `mio_cusum`. |
+| М3 — ОФЗ | `modules/m3_ofz.py` | `mad_cover_low`, `mad_yield_spread`, `mad_silence`, `auction_silence_days`, `flag_undersubscribed/oversubscribed`, `mio_cusum`. |
+| М4 — налоги | `modules/m4_tax.py` | TZ-флаги `flag_tax_peak_{15,20,25,28}`, `flag_end_of_month/quarter/year`, `flag_has_event`, `events_count`, `mad_events_count`, `seasonal_factor ∈ [1, 1.4]`, `mio_cusum`. |
+| М5 — казначейство | `modules/m5_treasury.py` | `mad_deficit`, `mad_delta_5d`, `mad_roskazna`, `flag_budget_drain[_strong]`, `mio_cusum`. |
+| Агрегатор | `aggregate.fit_model_suite` + `gbm_lsi.py` | LightGBM регрессор на прокси-таргет с walk-forward CV; SHAP-разложение по модулям; log-калибровка предсказаний в [0, 100]. |
+| LSI | `aggregate.lightgbm_lsi` | Собирает дашборд-frame: `lsi = log-calibrated raw_lgb`, `contrib_M{n} = share_M{n} × lsi`. |
+| Бэктест | `backtest.py` | Метрики на трёх ТЗ-эпизодах + hold-out ≥ 2024-01-01. |
+| Отчёты | `reporting.py` | LSI / per-module share / contributions / feature importance / noise breakdown / 5 per-module + 1 global correlation matrices. |
+| Дашборд | `dashboard/app.py` | Streamlit с табами LSI / Модули / Модели / Шум / Backtest / Авто-эпизоды / Sensitivity / Алерты / О системе. |
+| EDA | `scripts/eda.py` → `reports/EDA.md`, `reports/figures/eda/*.png` | Распределения сырых данных, хвосты, ACF, conditional correlations, M4-секция. |
+| Метрики | `scripts/eval_metrics.py` → `reports/EVAL_METRICS.md` | Regression / classification / temporal stability / lead-time на hold-out. |
+| Тесты | `tests/test_pipeline.py` | Unit-нормализация, MIO burn-in/response, форма выходов TZ, отсутствие subindex, MIO ∈ [0,1], LightGBM обучился, SHAP-attribution shape, walk-forward CV, noise breakdown ≈ Var(ΔLSI), log calibration monotone. |
+
+## LSI: расчёт и обоснование
+
+**LSI = LightGBM регрессор + log-калибровка в [0, 100].**
+
+ТЗ: «Алгоритм агрегации команда выбирает и обосновывает самостоятельно».
+ТЗ явно приводит три валидных варианта; первый из списка —
+*«Градиентный бустинг → SHAP values»*.  Мы выбрали этот вариант.
+
+### Шаг 1. Обучение LightGBM
+
+LightGBM регрессирует на **прокси-таргет стресса** `y(t)`, построенный
+из публичных индикаторов (см. `aggregate.build_proxy_target`):
+
+```
+y(t) = MAD-z₃ᵧ(RUONIA(t) - keyrate(t))  +  MAD-z₃ᵧ(структурный дефицит ликвидности(t))
+```
+
+Обе компоненты — `MAD-z` с 3-летним скользящим окном по ТЗ.  Это
+**ground-truth-like** независимая от модели характеристика стресса.
+
+Фичи — **полный** набор по всем 5 модулям: `mad_*` + `flag_*` +
+`mio_cusum`.  LightGBM обрабатывает мix continuous + binary natively
+(splits handle binaries как ordered values — никаких one-hot
+преобразований не требуется).
+
+### Шаг 2. Walk-forward CV и подбор гиперпараметров
+
+Train/test делится хронологически: train < `2024-01-01`, test ≥
+`2024-01-01`.  На train-окне `TimeSeriesSplit(n_splits=5)` — expanding
+window, без перемешивания.  Перебор:
+
+```
+num_leaves ∈ {15, 31}
+min_child_samples ∈ {40, 100}
+learning_rate ∈ {0.02, 0.05}
+feature_fraction ∈ {0.7, 0.9}
+bagging_fraction ∈ {0.8}
+reg_lambda = 1.0, reg_alpha = 0.5
+n_estimators_max = 1500 + early stopping (50 раундов на val-fold)
+```
+
+**1-SE rule**: среди конфигов в пределах 1 std от минимального `val MAE`
+выбирается **самый простой** (меньше деревьев, выше lr, сильнее
+регуляризация) — стандартное лечение переобучения GBM.  Финальная
+модель доучивается на всём train с `n_estimators = median(best_iteration)`
+по фолдам.
+
+### Шаг 3. Log-калибровка в [0, 100]
+
+Сырое предсказание `raw(t) = f_LGB(x(t))` живёт в шкале прокси-таргета.
+Калибруем в LSI:
+
+```
+q_low  = 10-й перцентиль raw на train
+q_high = 99-й перцентиль raw на train
+LSI(t) = clip(100 · (log raw(t) − log q_low) /
+                          (log q_high − log q_low),  0, 100)
+```
+
+#### Математическое обоснование выбора лог-калибровки с q10/q99
+
+1. **Распределение `raw`.** Прокси-таргет `y` построен из MAD-z-оценок
+   дефицита ликвидности и спредов.  Эти величины эмпирически
+   распределены log-normally (Cont 2001, *Empirical properties of asset
+   returns*, stylized fact финансовых рядов).  Хорошо обученный
+   регрессор воспроизводит форму условного распределения целевой
+   переменной, поэтому `raw ~ LogN(μ', σ'²)` с тяжёлым правым хвостом.
+
+2. **Замена переменной.** `log(raw) ~ N(μ', σ'²)` — стандартный
+   нормальный объект.  Аффинные преобразования сохраняют его геометрию.
+   Лог-калибровка — это **аффинный z-скейлинг `log(raw)` на интервал
+   [0, 100]** с привязкой к двум якорям.
+
+3. **Якоря q10 / q99 на train.**
+   - `q10` → LSI = 0: 10% самых спокойных дней train задают «дно».
+   - `q99` → LSI = 100: 1% самых стрессовых — «потолок».
+
+   Асимметрия (q10 vs q99, не q5 vs q95) согласована с задачей
+   **раннего предупреждения**: основная масса дней должна попадать в
+   green zone (LSI < 40), что соответствует пороговой схеме ТЗ
+   `LSI_THRESHOLDS = {green ≤ 40 < yellow ≤ 70 < red}`.
+
+4. **Альтернативы и почему они хуже:**
+   - **min/max** — слишком шумные на тяжёлохвостом распределении.
+   - **q5/q95** — слишком симметричны для early-warning system.
+   - **rank-CDF на train** (perc-rank): математически корректен, но
+     растягивает плотный центр распределения по всему [0, 100], из-за
+     чего LSI прыгает в спокойные дни между 10 и 80 практически без
+     причины.  Лог-калибровка сжимает центр и расширяет хвост —
+     стандартный приём для финансовых stress indicators (Kansas City
+     Fed FSI, Chicago Fed NFCI).
+
+5. **Гарантии без look-ahead.** Все якоря фиксируются на train-окне
+   (< 2024-01-01) **до** инференса на test.  Валидируется тестом
+   `test_walk_forward_cv_per_fold_results`.
+
+### Шаг 4. Помодульная интерпретация — SHAP
+
+Требование ТЗ: «Для каждого значения LSI необходимо показать вклад
+каждого модуля в итоговый сигнал».
+
+**SHAP TreeExplainer** даёт **exact** разложение для решающих деревьев:
+
+```
+shap_row    = TreeExplainer(model).shap_values(x(t))        # per-feature, signed
+share_M{i}  = |Σ shap_row[idx_M{i}]| / Σ |shap_row|         ∈ [0, 1]
+contrib_M{i}= share_M{i} · LSI                              # Σ contrib = LSI
+```
+
+По построению `Σ contrib_M{i}(t) = LSI(t)` тождественно.  ТЗ прямо
+называет это валидной интерпретацией: «Градиентный бустинг → SHAP
+values».  Хранится в `artifacts/model_lightgbm_module_attribution.parquet`.
+
+### Шаг 5. Статус (ТЗ)
+
+```
+0 ≤ LSI ≤ 40  → 🟢 GREEN
+40 < LSI ≤ 70 → 🟡 YELLOW
+70 < LSI ≤ 100 → 🔴 RED
+```
+
+### Sensitivity (±20%) — требование ТЗ
+
+ТЗ: «Sensitivity analysis: как меняется LSI при отклонении весов ±20%
+от базовых».  Поскольку LSI не имеет весов как таковых, sensitivity
+переинтерпретирован как перебор **LightGBM-гиперпараметров**
+(`learning_rate`, `num_leaves`, `min_child_samples`) ±20% с полным
+переобучением на том же train и той же лог-калибровкой.  Сохраняется
+в `artifacts/sensitivity.parquet` и `sensitivity_summary.csv`.
+
+## Backtest и hold-out
+
+* **ТЗ-эпизоды** (`backtest.evaluate_episodes`): декабрь 2014,
+  февраль-март 2022, август 2023.  Метрики: max LSI, доля 🔴 / 🟡 дней,
+  лидирующий модуль по `contrib_M{n}`.
+* **Hold-out** (`backtest.holdout_metrics`) на ≥ 2024-01-01: regression
+  + classification метрики LSI против прокси-таргета (модель не видела
+  это окно при подборе гиперпараметров).
+* **Auto-detected episodes** (`aggregate.detect_stress_episodes`):
+  топ-K непересекающихся всплесков LSI > p90 — проверка на эпизодах,
+  не вошедших в ТЗ.
+
+## Шум LSI
+
+`noise_breakdown(lsi_frame)` раскладывает `Var(ΔLSI)` на per-module +
+кросс-ковариационные термы:
+
+```
+Var(ΔLSI) = Σᵢ Var(Δcontrib_Mᵢ) + 2 Σᵢ<ⱼ Cov(Δcontrib_Mᵢ, Δcontrib_Mⱼ)
+```
+
+Точное разложение, потому что `LSI = Σ contrib_Mᵢ` тождественно.
+Отрицательные кросс-ков-термы означают, что пара модулей шумит
+**противофазно** и взаимно гасит дрожание LSI.
+
+## Артефакты
+
+После `python scripts/run_pipeline.py` в `artifacts/`:
+
+- `lsi_daily.parquet` — LSI + `score_M{n}` + `contrib_M{n}` + `share_M{n}` + статус.
+- `features_daily.parquet` — все per-module фичи (TZ outputs).
+- `proxy_target.parquet` — ряд прокси-таргета.
+- `model_predictions.parquet` — LSI (LightGBM, log-calibrated).
+- `model_metrics.csv` — train/test/CV метрики.
+- `model_best_params.csv` — победивший конфиг + median best_iteration.
+- `model_cv_results.csv` — все per-config × per-fold метрики walk-forward.
+- `model_lightgbm_module_attribution.parquet` — SHAP-атрибуция (share_M{n}, contrib_M{n}).
+- `noise_breakdown.csv` — Var(ΔLSI) decomposition.
+- `sensitivity.parquet` + `sensitivity_summary.csv` — ±20% к гиперпараметрам.
+- `backtest_episodes.csv` + `auto_episodes.csv` — стресс-эпизоды.
+- `metadata.json` — диагностика прогона.
+
+## Установка и запуск
+
+### Установка зависимостей
+
+```bash
+cd <repo-root>
+
+# 1) Аналитический пайплайн (lightgbm, shap, streamlit, pytest)
+python -m pip install -e ".[models,dashboard,dev]"
+
+# 2) Парсеры (requests, beautifulsoup4, tenacity, click, ...)
+python -m pip install -r parsers/requirements.txt
+```
+
+На Linux/macOS можно также запустить `make install` (делает оба шага сразу).
+
+### End-to-end запуск
+
+```bash
+# Полный цикл: парсеры → копирование CSV → пайплайн → все отчёты и графики
+python scripts/fetch_and_run.py
+
+# Или через make:
+make all
+```
+
+`fetch_and_run.py` поддерживает флаги:
+
+* `--skip-fetch` — пропустить парсинг, использовать существующие CSV.
+* `--skip-pipeline` — пропустить обучение модели.
+* `--skip-reports` — пропустить EDA/eval-отчёты (`scripts/eda.py`, `scripts/eval_metrics.py`).
+* `-- <args>` — всё после `--` форвардится в `fetch_all.py` (например, `-- --from 2020-01-01`).
+
+### Только парсеры
+
+```bash
+cd parsers
+python scripts/fetch_all.py               # все 5 модулей за всё время
+python scripts/fetch_m1.py                # отдельные модули запускаются явно
+python scripts/fetch_m2.py --detailed
+python scripts/fetch_m3.py
+python scripts/fetch_m4.py
+python scripts/fetch_m5.py --roskazna-pages 10
+
+# Пользовательский диапазон / пропуск модулей:
+python scripts/fetch_all.py --from 2020-01-01 --skip-m4
+```
+
+Результат — CSV в `parsers/data/processed/`.
+
+### Только аналитический пайплайн
+
+Если CSV уже скопированы в `data/raw/` (это произошло после первого
+запуска `fetch_and_run.py` или вручную):
+
+```bash
+python scripts/run_pipeline.py     # обучение LightGBM, расчёт LSI (~3-5 мин CPU)
+python scripts/eda.py              # EDA-отчёт
+python scripts/eval_metrics.py     # метрики на test/holdout
+python -m pytest -q                # тесты
+python -m streamlit run dashboard/app.py     # дашборд
+```
+
+## Источники данных и парсеры
+
+| Модуль | Источник | Что собираем | CSV |
+| --- | --- | --- | --- |
+| **M1** | ЦБ — `RReserves/required_reserves_table.xlsx`, `hd_base/ruonia/dynamics/` | Обязательные резервы (факт/норматив остатки) + RUONIA daily | `m1_rreserves.csv`, `m1_ruonia.csv` |
+| **M2** | ЦБ — `hd_base/repo/`, `hd_base/keyrate/` | Аукционы РЕПО + ключевая ставка | `m2_repo_auctions.csv`, `m2_keyrate.csv` |
+| **M3** | Минфин — `perfomance/public_debt/internal/operations/ofz/auction` (yearly XLSX) | ОФЗ-аукционы 2015–2026 (предложение/спрос/размещение, доходности, cover ratio) | `m3_ofz_auctions.csv` |
+| **M4** | ФНС — `nalog.gov.ru/opendata/7707329152-kalendar/` (XML-снапшоты с 2014 по 2026) | Налоговый календарь и дневные флаги (пики 13-16/18-22/23-25/25-28, конец месяца/квартала/года) | `m4_tax_calendar.csv`, `m4_tax_flags_daily.csv` |
+| **M5** | ЦБ — `hd_base/bliquidity/`, СОРС `Funds_all.xlsx`; Росказна — индекс операционных дней по депозитам ЕКС | Дефицит/профицит ликвидности банковского сектора (с 2014 г.), привлечённые средства организаций, индекс депозитов ЕКС | `m5_bliquidity.csv`, `m5_sors_funds_all.csv`, `m5_roskazna_eks_deposits_index.csv` |
+
+Полное описание парсеров см. в **[parsers/README.md](parsers/README.md)**.
+
+## Соответствие ТЗ
+
+| Требование ТЗ | Реализация |
+| --- | --- |
+| 5 модулей М1-М5 с MAD-нормализацией на 3-летнем окне | ✅ `modules/m{1..5}_*.py`, `MAD_WINDOW_DAYS = 3·365` |
+| MIO CUSUM поверх MAD-z | ✅ `normalize.RobustOnlineCUSUM` |
+| Открытые источники данных (ЦБ, Минфин, Росказна, ФНС, Мосбиржа) | ✅ `parsers/` — отдельный пакет, CLI `fetch_m{1..5}.py` и `fetch_all.py` |
+| ML-метод на выбор команды | ✅ LightGBM (ТЗ прямо приводит «Градиентный бустинг → SHAP values» как валидный пример) |
+| Обоснование выбора алгоритма | ✅ См. секцию «LSI: расчёт и обоснование» в этом README |
+| Интерпретация вклада каждого модуля | ✅ SHAP-разложение → `share_M{n}`, `contrib_M{n}`, тождество `Σ contrib = LSI` |
+| LSI 0–100 + статус 🟢🟡🔴 | ✅ `LSI_THRESHOLDS = {40, 70}`, `lsi_status` |
+| Дашборд + алерты + графики | ✅ Streamlit (`dashboard/app.py`), таблицы и графики артефактов |
+| Backtest на 3 эпизодах (дек 2014, фев-мар 2022, авг 2023) | ✅ `backtest.evaluate_episodes`, `BACKTEST_EPISODES` |
+| Hold-out на отложенной выборке | ✅ `backtest.holdout_metrics`, train < 2024-01-01 / test ≥ 2024-01-01 |
+| Sensitivity ±20% | ✅ `aggregate.sensitivity_analysis` — переинтерпретирован под LightGBM-гиперпараметры |
+| Технические требования: Python, pandas, scipy, scikit-learn | ✅ + LightGBM, SHAP, Streamlit, requests, tenacity (для парсеров) |
+| Автоматический сбор данных: онлайн или ≥ 1 раза в день | ✅ `parsers/scripts/fetch_all.py` — все 5 модулей за один запуск.  Поддерживает инкрементальный update (`--from / --to`) для cron-job. |
+| Бонус — LLM-комментарий | ❌ не реализован |
+
+## Изменения относительно предыдущих фаз
+
+* Удалены: ElasticNet (Phase 1–3), Denoising Score Matching (Phase 5–6), XGBoost (Phase 5–6).  Остался LightGBM как единственный агрегатор.
+* Удалена взвешенная сумма из ТЗ-баллов: баллы 15/20/15/10 — это **схема оценки команды**, а не веса в формуле агрегации.
+* LSI считается через **log-калибровку** предсказаний LightGBM с якорями q10/q99 train-распределения (стандартный приём для финансовых stress indicators).
+* Помодульный вклад — **SHAP TreeExplainer** (exact для деревьев).
+* Sensitivity ±20% — на LightGBM-гиперпараметрах.
+* Все смыкатели и интерполяторы убраны (no smoothing requirement).

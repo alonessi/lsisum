@@ -1,0 +1,2 @@
+[console_scripts]
+ru-liquidity-sentinel = ru_liquidity_sentinel.__main__:main

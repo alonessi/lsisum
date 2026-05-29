@@ -1,0 +1,94 @@
+"""Module M5 — Federal treasury & bank-sector liquidity."""
+
+from __future__ import annotations
+
+import numpy as np
+import pandas as pd
+
+from ..normalize import (
+    align_to_calendar,
+    rolling_mad_zscore,
+    robust_online_cusum_series,
+)
+
+
+# Mapping from actual bliquidity CSV column names to the internal m5_
+# feature names the rest of the pipeline expects.
+#
+# The bliquidity CSV ships:
+#   deficit_total_blnrub, bank_corraccounts_blnrub,
+#   delta_1d_blnrub, delta_5d_blnrub, delta_22d_blnrub,
+#   flag_budget_drain, flag_budget_drain_strong
+#
+# Previous code referenced "eks_*" column names that never existed
+# in the actual data, which silently produced all-zero features.
+_BL_COLUMN_MAP = [
+    ("bank_corraccounts_blnrub",    "m5_eks_balance_blnrub"),
+    ("delta_1d_blnrub",             "m5_eks_delta_1d"),
+    ("delta_5d_blnrub",             "m5_eks_delta_5d"),
+    ("delta_22d_blnrub",            "m5_eks_delta_22d"),
+    ("flag_budget_drain",           "m5_flag_budget_drain"),
+    ("flag_budget_drain_strong",    "m5_flag_budget_drain_strong"),
+]
+
+
+def build_m5(
+    bliquidity: pd.DataFrame,
+    roskazna_index: pd.DataFrame,
+    calendar: pd.DatetimeIndex,
+    mad_window_days: int,
+) -> pd.DataFrame:
+    """Construct the M5 daily feature frame."""
+
+    bl = bliquidity.copy().set_index("date").sort_index()
+
+    out = pd.DataFrame(index=calendar)
+    out.index.name = "date"
+
+    for src, dst in _BL_COLUMN_MAP:
+        if src in bl.columns:
+            out[dst] = align_to_calendar(
+                bl[src], calendar, method="ffill", fill_value=0.0
+            )
+        else:
+            out[dst] = 0.0
+
+    out[["m5_flag_budget_drain", "m5_flag_budget_drain_strong"]] = out[
+        ["m5_flag_budget_drain", "m5_flag_budget_drain_strong"]
+    ].astype("int8")
+
+    # MAD based on the treasury 5-day delta drain (lower values = larger drain)
+    out["m5_mad_treasury_drain"] = rolling_mad_zscore(
+        out["m5_eks_delta_5d"], window_days=mad_window_days, direction="lower"
+    )
+
+    # Roskazna: the actual CSV only provides n_documents (count of
+    # daily operational orders).  Use it as a proxy for treasury
+    # activity; a rolling 5-day diff captures momentum.
+    rk = roskazna_index.copy().set_index("date").sort_index()
+    rk_col = (
+        rk["volume_placed_blnrub"]
+        if "volume_placed_blnrub" in rk.columns
+        else rk.get("n_documents", pd.Series(dtype=float))
+    )
+    rk_vol = align_to_calendar(rk_col, calendar, method="ffill", fill_value=0.0)
+
+    rk_delta_5d = rk_vol.diff(periods=5).fillna(0.0)
+    out["m5_roskazna_delta_5d_blnrub"] = rk_delta_5d
+
+    out["m5_mad_roskazna_drain"] = rolling_mad_zscore(
+        rk_delta_5d, window_days=mad_window_days, direction="lower"
+    )
+
+    roskazna_drain_flag = (rk_delta_5d <= -300.0).astype("int8")
+    out["m5_flag_budget_drain"] = (
+        out["m5_flag_budget_drain"] | roskazna_drain_flag
+    ).astype("int8")
+
+    # MIO CUSUM on the 5-day delta (tracking the drain momentum)
+    out["m5_mio_cusum"] = robust_online_cusum_series(
+        out["m5_eks_delta_5d"].rename("m5"),
+        window_size=min(756, mad_window_days),
+    ).values
+
+    return out
