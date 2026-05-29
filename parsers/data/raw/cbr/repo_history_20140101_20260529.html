@@ -1,0 +1,4282 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="format-detection" content="telephone=no" />
+<meta name="zoom:lang" content="ru" />
+    <meta name="zoom:last-modified" content="Mon, 25 May 2026 21:00:00 GMT" />
+    <meta name="zoom:tags" content="БазыДанных, InMaterials" />
+<title>Итоги аукционов репо | Банк России</title>
+
+
+
+    <meta property="og:image" content="/common/images/share-1.jpg" />
+
+    
+
+
+            <link rel="stylesheet" type="text/css" href="/common/libs/jquery-ui/jquery-ui.min.css?v=v478607061" media="all">
+
+            <!--[if IE 9]><link rel="stylesheet" type="text/css" href="/common/style/main-ie9.css?v=v1910799576" media="all"><![endif]-->
+
+            <!--[if gt IE 9]><!--><link rel="stylesheet" type="text/css" href="/common/style/main.min.css?v=v1910799576" media="all"><!--<![endif]-->
+
+
+        <script type="text/javascript" src="/common/libs/jquery-3.7.1.min.js?v=v735956814"></script>
+
+
+
+        <script type="text/javascript" src="/common/libs/jquery-ui/jquery-ui.min.js?v=v478607061"></script>
+
+        <script type="text/javascript" src="/common/libs/jquery.inputmask.min.js?v=v478607061"></script>
+
+
+        <script type="text/javascript" src="/common/scripts/vendor.js?v=v4270970564"></script>
+
+        <script type="text/javascript" src="/common/libs/jquery.floatThead.min.js?v=v478607061"></script>
+
+
+
+
+
+
+
+
+        <script type="text/javascript" src="/common/libs/popper.js?v=v478607061"></script>
+
+        <script type="text/javascript" src="/common/libs/tippy.js?v=v478607061"></script>
+
+        <script type="text/javascript" src="/common/scripts/main.min.js?v=v1910799576"></script>
+
+
+        <script type="text/javascript" src="/common/libs/localization-ru.js?v=v712023859"></script>
+        <script type="text/javascript" src="/js/jquery.ui.autocomplete-ru.js?v=v1043438991"></script>
+
+        <script type="text/javascript" src="/js/jquery.cookie.min.js?v=v4260771145"></script>
+
+        <script type="text/javascript" src="/js/site.js?v=v2848633841"></script>
+
+
+
+
+
+<script src="/Modules/Queries/Scripts/queries-ui.js?v=v662783731" type="text/javascript"></script>
+    <script type="text/javascript">
+    $(function () {
+        var $menu = $('[data-menu]'),
+            $menuItemBtn = $menu.find('[data-menu-item-btn]'),
+            $menuShow = $('[data-menu-show]'),
+            $menuClose = $('[data-menu-close]');
+        var config = $menu.data('config');
+
+        $menuShow.on('click.cms_loadwholesite', function (event) {
+            loadWholeSite(true);
+        });
+        $menuShow.on('mouseenter.cms_loadwholesite', function (event) {
+            loadWholeSite(false);
+        });
+
+        var xhr = null, g_openMenu = false;
+        function loadWholeSite(openmenu) {
+            g_openMenu = g_openMenu || openmenu;
+            $menuShow.off('click.cms_loadwholesite mouseenter.cms_loadwholesite');
+            if (xhr === null) {
+                $('.menu_wrap .networks-circle').html($('.networks-circle.footer_networks').html());
+                $('.menu_wrap .header_search').html($('.header .offsetMenu .header_search').html());
+
+                xhr = $.ajax(config.url, {
+                    dataType: "html",
+                    method: "get",
+                    success: function (html) {
+                        $('[data-cms-wholesite-placeholder]').replaceWith(html);
+
+                        $menu.find('.menu_tab[data-tabs-tab]').each(function () {
+                            var tab = $(this).data('tabs-tab');
+                            $(this).toggle($menu.find('[data-tabs-content="' + tab + '"]').length != 0);
+                        });
+
+                        $menu.trigger('new-html');
+
+                        for (var i in config.catalogPath) {
+                            $menu.find('li[data-catalog-id="' + config.catalogPath[i] + '"]')
+                                .addClass("_active");
+                            $menu.find('li[data-catalog-id="' + config.catalogPath[i] + '"]')
+                                .closest('[data-tabs-content]')
+                                .trigger('open-anchor');
+                        }
+
+                        
+                        xhr = true;
+                    },
+                    error: function () {
+                        xhr = null;
+                    }
+                });
+            }
+        }
+    });
+    </script>
+
+
+<script>
+    if (window.localStorage) {
+        if (localStorage.getItem('vision-impaired'))
+            document.getElementsByTagName('html')[0].className += ' vision-impaired';
+    }
+</script>
+<script>
+    document.documentElement.style.setProperty('--scrollbar-width', '17px');
+    setTimeout(function () {
+        
+        var div = document.createElement('div');
+
+        div.style.overflowY = 'scroll';
+        div.style.width = '50px';
+        div.style.height = '50px';
+
+        
+        div.style.visibility = 'hidden';
+
+        document.body.appendChild(div);
+        var scrollWidth = Math.max(div.offsetWidth - div.clientWidth, 0.15); 
+        document.body.removeChild(div);
+        
+        document.documentElement.style.setProperty('--scrollbar-width', scrollWidth + 'px');
+    }, 0);
+</script>
+
+
+
+
+    
+</head>
+<body class="page-v3 page-v3-inside">
+
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+    (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+    m[i].l=1*new Date();
+    for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+    k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+    (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+
+    ym(5774506, "init", {
+        clickmap:true,
+        trackLinks:true,
+        accurateTrackBounce:true,
+        webvisor:true
+    });
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/5774506" style="position:absolute; left:-9999px;" alt="" /></div></noscript>    
+<!-- /Yandex.Metrika counter -->
+        
+    
+
+    <div class="header-print">
+    <div class="offsetMenu">
+        <div class="header-print_inner">
+            <img class="header-print_logo" alt="cbr" src="/common/images/logo.svg">
+            <ul class="header-print_contacts">
+<li>107016, Москва, ул. Неглинная, д.&nbsp;12, к. В, Банк России</li>
+<li><nobr class="phone">8 800 300-30-00</nobr></li>
+<li>www.cbr.ru</li>
+</ul>
+
+        </div>
+    </div>
+</div>
+
+    <header class="header" id="header">
+        <div class="top-line" data-top-line="">
+            <div class="header_burger-big"></div>
+            <div class="offsetMenu">
+                <div class="col-md-23 header_margin-left">
+                    <div class="top-line_inner header_inner">
+                        
+
+<div class="row">
+    <div class="col-xl-4 col-md-6">
+        <div class="header_left pr-0">
+                <div class="header_menu" data-menu-show=""></div>
+            <a class="header_logo" href="/"></a>
+                <a class="header_search_btn d-flex d-md-none" href="#" data-search-form-show="" aria-label="Поиск по сайту"><div class="header_search_icon"></div></a>
+            <a class="d-flex d-md-none" href="#" data-tooltip="" data-tooltip-content="Версия для слабовидящих" data-tooltip-class="mobile-hide"><div class="header_visual-impaired_item"></div></a>
+        </div>
+    </div>
+    <div class="col-xl-17 col-md-13 offset-md-1 header_block">
+        <div class="d-none d-md-block">
+            <div class="header_right">
+                <div class="networks header_link header_networks"><a class="header_appeal-link" href="/contactBR/" data-tooltip="" data-tooltip-content="Обратиться в Банк России" data-tooltip-class="mobile-hide"></a></div>
+                <div class="networks header_networks header_visual-impaired header_visual-impaired_inner"><a href="#" data-tooltip="" data-tooltip-content="Версия для слабовидящих" data-tooltip-class="mobile-hide" aria-label="Версия для слабовидящих"><div class="header_visual-impaired_item"></div></a></div>
+                <div class="header_lang header_lang_inner header_networks">
+    <a href="/Localization/SwitchLanguage?url=%2Fhd_base%2Frepo%2F%3FUniDbQuery.Posted%3DTrue%26UniDbQuery.From%3D01.01.2014%26UniDbQuery.To%3D29.05.2026&amp;from=ru-RU&amp;to=en-CB"><!--noindex-->EN<!--/noindex--></a>
+</div>
+                    <div class="header_networks header_search header_search_inner">
+                        <a class="header_search_btn" href="#" data-search-form-show="" aria-label="Поиск по сайту"><div class="header_search_icon"></div><span aria-hidden="true">Поиск по сайту</span></a>
+                    </div>
+            </div>
+        </div>
+    </div>
+</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="offsetMenu">
+            <div class="col-md-23 offset-md-1 header_margin-left">
+                <div class="header_inner">
+                    
+<div class="row">
+    <div class="col-xl-5 col-md-6">
+        <div class="header_left pr-0">
+            <div class="header_menu" data-menu-show=""></div>
+            <a class="header_logo" href="/"></a>
+            <a class="header_search_btn d-flex d-md-none" href="#" data-search-form-show="" aria-label="Поиск по сайту">
+                <div class="header_search_icon"></div>
+            </a>
+            <a class="d-flex d-md-none" href="#" data-tooltip data-tooltip-content="Версия для слабовидящих" data-tooltip-class="mobile-hide">
+                <div class="header_visual-impaired_item"></div>
+            </a>
+        </div>
+    </div>
+    <div class="col-xl-17 col-md-13 offset-md-1 header_block justify-content-end">
+        <div class="d-none d-md-block">
+            <div class="header_right">
+                <div class="networks header_link header_networks"><a class="header_appeal-link" href="/contactBR/" data-tooltip="" data-tooltip-content="Обратиться в Банк России" data-tooltip-class="mobile-hide"></a></div>
+                <div class="networks header_networks header_visual-impaired header_visual-impaired_inner">
+                    <a href="#" data-tooltip data-tooltip-content="Версия для слабовидящих" data-tooltip-class="mobile-hide" aria-label="Версия для слабовидящих">
+                        <div class="header_visual-impaired_item"></div>
+                    </a>
+                </div>
+                <div class="header_lang header_lang_inner header_networks">
+    <a href="/Localization/SwitchLanguage?url=%2Fhd_base%2Frepo%2F%3FUniDbQuery.Posted%3DTrue%26UniDbQuery.From%3D01.01.2014%26UniDbQuery.To%3D29.05.2026&amp;from=ru-RU&amp;to=en-CB"><!--noindex-->EN<!--/noindex--></a>
+</div>
+                <div class="header_networks header_search header_search_inner">
+                    <a class="header_search_btn" href="#" data-search-form-show="" aria-label="Поиск по сайту">
+                        <div class="header_search_icon"></div><span aria-hidden="true">Поиск по сайту</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <form action="/search/" method="get" class="search-form" data-search-form=""
+      data-api-url="/Content/SearchSuggest/Suggest"
+      data-api-top-url="">
+    <div class="offsetMenu">
+        <div class="col-md-23 offset-md-1">
+            <div class="search-form_inner">
+                <div class="search-form_title">Что вы хотите найти?<img class="search-form_title-close" src="/common/images/icons/menu-close-dark-grey.svg"></div>
+                <div class="search-form_content">
+                    <div class="search-form_block">
+                        <div class="search-form_icon"></div>
+                        <div class="search-form_field">
+                            <input name="text" type="text" autocomplete="off" placeholder="Начните писать" data-search-form-input="" />
+                        </div>
+                    </div>
+                    <div class="search-form_clear" data-search-form-clear-btn=""><img src="/common/images/icons/menu-close-gray.svg"></div>
+                    <div class="search-form_btn">
+                        <button class="b-btn _blue" data-search-form-btn="">Искать</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+
+<div class="menu_wrap" data-menu="" data-config="{&quot;catalogPath&quot;:[21427,29236,16493],&quot;url&quot;:&quot;/Catalog/SiteMap/GetWholeSiteHtml?blockId=59191&quot;}">
+    <div class="offsetMenu">
+        <div class="header_menu _close menu_close d-none d-md-block" data-menu-close=""></div>
+        <div class="header_inner top-line_inner d-block d-md-none">
+            <div class="row">
+                <div class="col-xl-5 col-md-9">
+                    <div class="header_left pr-0">
+                        <div class="header_menu _close" role="button" tabindex="0" aria-label="Закрыть меню" data-menu-close=""></div>
+                        <a class="header_logo" href="/"></a>
+                        <a class="header_search_btn" href="#" data-search-form-show="data-search-form-show" aria-label="Поиск по сайту"><div class="header_search_icon"></div></a>
+                        <a href="#" data-tooltip="data-tooltip" data-tooltip-content="Версия для слабовидящих" data-tooltip-class="mobile-hide"><div class="header_visual-impaired_item"></div></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="menu row" data-tabs="data-tabs">
+            <div class="menu_quick col-md-7">
+                <div role="tablist" class="menu_quick_tabs">
+    <a role="tab" id="menu_tab_Activity" aria-controls="menu_content_Activity" aria-selected="true" class="menu_tab _active" href="#" data-tabs-tab="Activity">Деятельность</a>
+    <a role="tab" id="menu_tab_FinancialMarkets" aria-controls="menu_content_FinancialMarkets" aria-selected="false" class="menu_tab" href="#" data-tabs-tab="FinancialMarkets">Финансовые рынки</a>
+    <a role="tab" id="menu_tab_Documents" aria-controls="menu_content_Documents" aria-selected="false" class="menu_tab" href="#" data-tabs-tab="Documents">Документы и данные</a>
+    <a role="tab" id="menu_tab_AboutBank" aria-controls="menu_content_AboutBank" aria-selected="false" class="menu_tab" href="#" data-tabs-tab="AboutBank">О Банке России</a>
+    <a role="tab" id="menu_tab_Services" aria-controls="menu_content_Services" aria-selected="false" class="menu_tab" href="#" data-tabs-tab="Services">Сервисы</a>
+</div>
+<div class="menu_quick_links">
+    <div class="inner_links"><a href="/support_measures/" title="Меры зашиты финансового рынка" style="color:red">Меры защиты финансового рынка</a>
+  </div>
+<div class="phones"><a class="menu_phone_val" href="tel:+74993003000">
+<div class="plus">+</div>7 499 300-30-00</a><a class="menu_phone_val" href="tel:88003003000">8 800 300-30-00</a><a class="menu_phone_val" href="tel:300">300</a><span>Бесплатно для звонков с мобильных телефонов</span></div>
+<div class="inner_links">
+  <a href="/news/" title="Новости">Новости</a>
+  <a href="/rbr/" title="Решения Банка России">Решения Банка России</a>
+  <a href="/contacts/" title="Контактная информация">Контактная информация</a>
+  <a href="/sitemap" title="Карта сайта">Карта сайта</a>
+  <a href="/about/" title="О сайте">О сайте</a>
+  </div>
+<div class="networks-circle">
+  <a class="networks-circle_item _vk" href="https://vk.com/cbr_official" title="ВКонтакте"></a>
+  <a class="networks-circle_item _yt" href="https://www.youtube.com/user/BankofRussia" title="Youtube"></a>
+  <a class="networks-circle_item _tg" href="https://t.me/centralbank_russia" title="Telegram"></a>
+  <a class="networks-circle_item _ydzen" href="https://zen.yandex.ru/id/622372d6a565892091994ea9" title="Яндекс Дзен"></a>
+  <a class="networks-circle_item _ok" href="https://ok.ru/group/68858679787580" title="Одноклассники"></a>
+  <a class="networks-circle_item _rt" href="https://rutube.ru/channel/23873201/" title="RUTUBE"></a>
+  <a class="networks-circle_item _max" href="https://max.ru/cbr_official" title="Макс"></a>
+</div>
+</div>
+            </div>
+            <div class="d-md-none link-above">
+                <div class="header_right">
+                    <div class="header_link"><a href="/contactBR/">Обратиться в&nbsp;Банк России</a></div>
+                    <div class="header_lang">
+            <div class="header_lang_item _active"><span><!--noindex-->RU<!--/noindex--></span></div>
+            <div class="header_lang_item"><a href="/Localization/SwitchLanguage?url=%2Fhd_base%2Frepo%2F%3FUniDbQuery.Posted%3DTrue%26UniDbQuery.From%3D01.01.2014%26UniDbQuery.To%3D29.05.2026&amp;from=ru-RU&amp;to=en-CB"><!--noindex-->EN<!--/noindex--></a></div>
+</div>
+                </div>
+<div class="header_right"><div class="header_link"><a href="/about_br/">О Банке России</a></div></div>
+<div class="header_right"><div class="header_link"><a href="/beware/">Осторожно: мошенники!</a></div></div>            </div>
+            <div class="menu_content_container col-md with-centered-loader" data-cms-wholesite-placeholder="">
+            </div>
+        </div>
+    </div>
+</div>
+
+    <main id="content">
+        <div class="offsetMenu ">
+            <div class="container-fluid">
+                <div class="col-md-23 offset-md-1">
+                    <div class="breadcrumbs">
+    <div class="breadcrumbs_item"><a class="breadcrumbs_home" href="/"></a></div>
+        <div class="breadcrumbs_item">
+            <a href="/hd_base/"><!--noindex-->Базы данных<!--/noindex--></a>
+        </div>
+        <div class="breadcrumbs_item">
+            <a href="/hd_base/repodb/"><!--noindex-->Репо<!--/noindex--></a>
+        </div>
+    </div>
+
+                    <!--index-->
+<h1><span class="referenceable">Итоги аукционов репо</span>
+</h1>
+                                        
+
+
+
+
+
+
+                                                                                
+
+<script type="text/javascript">
+<!--
+    var UniDbQuery_Data = {};
+// -->
+</script>
+
+        <!--noindex-->
+<div class="block-part">
+<form action="/hd_base/repo/?UniDbQuery.Posted=True&amp;UniDbQuery.From=01.01.2014&amp;UniDbQuery.To=29.05.2026" data-auto-submit="true" method="get"><input id="UniDbQuery_Posted" name="UniDbQuery.Posted" type="hidden" value="True" />        <div class="block-part vertical" id="UniDbQuery_form">
+
+
+
+
+    <div class="filters_wrapper">
+        <div class="filters">
+
+
+
+    <div class="filter" >
+            <div class="datepicker-filter" data-datepicker-period-filter
+         data-min-date="21.11.2002"
+         data-max-date="26.05.2026"
+         data-default-value-from="26.05.2026"
+         data-default-value-to="26.05.2026">
+        <input class="datepicker-filter_input-from" type="hidden" name="UniDbQuery.From" value="01.01.2014" />
+        <input class="datepicker-filter_input-to" type="hidden" name="UniDbQuery.To" value="26.05.2026" />
+        <button class="datepicker-filter_button" type="button">01.01.2014 - 26.05.2026</button>
+        <div class="datepicker-filter_modal">
+            <div class="datepicker-filter_head">
+                <div class="datepicker-filter_close"></div>
+            </div>
+            <div class="datepicker-filter_tabs">
+                <div class="datepicker-filter_tab-from"></div>&nbsp;-&nbsp;
+                <div class="datepicker-filter_tab-to"></div>
+            </div>
+            <div class="datepicker-filter_body">
+                <div class="datepicker-filter_datepicker-from datepicker-custom"></div>
+                <div class="datepicker-filter_datepicker-to datepicker-custom"></div>
+            </div>
+            <div class="datepicker-filter_footer">
+                <button class="datepicker-filter_apply-btn" type="button">Применить</button>
+            </div>
+        </div>
+    </div>
+
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <div class="filter"
+             data-filter="select"
+             data-default-value="0">
+                <div class="filter_placeholder">срок </div>
+            <button class="filter_title" type="button" data-filter-title data-tooltip>0</button>
+            <div class="filter_content" data-filter-content>
+                <div class="filter_content_top">
+                    <div class="filter_content_close" data-filter-close></div>
+                </div>
+                <div class="filter-select">
+
+                        <div class="filter-select_option">
+                            <input type="radio" name="UniDbQuery.P1" id="UniDbQuery_P1_1"
+                                   
+                                   value="0"
+                                   checked />
+                            <label for="UniDbQuery_P1_1">любой</label>
+                        </div>
+                        <div class="filter-select_option">
+                            <input type="radio" name="UniDbQuery.P1" id="UniDbQuery_P1_2"
+                                   
+                                   value="1"
+                                    />
+                            <label for="UniDbQuery_P1_2">&lt;= 5 дней</label>
+                        </div>
+                        <div class="filter-select_option">
+                            <input type="radio" name="UniDbQuery.P1" id="UniDbQuery_P1_3"
+                                   
+                                   value="5"
+                                    />
+                            <label for="UniDbQuery_P1_3">&gt; 5 дней</label>
+                        </div>
+                </div>
+            </div>
+        </div>
+
+        </div>
+    </div>
+
+
+
+
+
+
+
+        </div>
+</form></div>        <!--/noindex-->
+<div class="table-wrapper">
+  <div class="BnkHeader"><br><table class="data">
+      <tr>
+        <th><nobr>Тип аукциона</nobr></th>
+        <th>Срок, дни</th>
+        <th>Дата</th>
+        <th>Время<br>аукциона</th>
+        <th>Общий объем заключенных сделок,<br>млн руб.</th>
+        <th>Средневзвешенная ставка,<br>% годовых</th>
+        <th>Код расчета</th>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>26.05.2026</td>
+        <td>13:30 </td>
+        <td class="rr">4 320 000,0</td>
+        <td class="rr">14,5132</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>19.05.2026</td>
+        <td>13:30 </td>
+        <td class="rr">4 410 000,0</td>
+        <td class="rr">14,5124</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>12.05.2026</td>
+        <td>13:28 </td>
+        <td class="rr">4 780 000,0</td>
+        <td class="rr">14,5112</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>05.05.2026</td>
+        <td>13:28 </td>
+        <td class="rr">4 130 000,0</td>
+        <td class="rr">14,5141</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>28.04.2026</td>
+        <td>13:32 </td>
+        <td class="rr">4 590 000,0</td>
+        <td class="rr">14,5494</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>21.04.2026</td>
+        <td>13:28 </td>
+        <td class="rr">4 480 000,0</td>
+        <td class="rr">15,0114</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>14.04.2026</td>
+        <td>13:30 </td>
+        <td class="rr">4 330 000,0</td>
+        <td class="rr">15,0130</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>1</td>
+        <td>14.04.2026</td>
+        <td>11:31 </td>
+        <td class="rr">310 000,0</td>
+        <td class="rr">15,0015</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>07.04.2026</td>
+        <td>13:32 </td>
+        <td class="rr">4 610 000,0</td>
+        <td class="rr">15,0151</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>31.03.2026</td>
+        <td>13:32 </td>
+        <td class="rr">4 220 000,0</td>
+        <td class="rr">15,0319</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>24.03.2026</td>
+        <td>13:35 </td>
+        <td class="rr">4 090 000,0</td>
+        <td class="rr">15,0471</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>17.03.2026</td>
+        <td>13:36 </td>
+        <td class="rr">4 180 000,0</td>
+        <td class="rr">15,5082</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>10.03.2026</td>
+        <td>13:36 </td>
+        <td class="rr">3 660 000,0</td>
+        <td class="rr">15,5144</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>1</td>
+        <td>10.03.2026</td>
+        <td>11:30 </td>
+        <td class="rr">3 080 000,0</td>
+        <td class="rr">15,5069</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>03.03.2026</td>
+        <td>13:54 </td>
+        <td class="rr">2 990 000,0</td>
+        <td class="rr">15,5207</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>24.02.2026</td>
+        <td>13:32 </td>
+        <td class="rr">3 190 000,0</td>
+        <td class="rr">15,5279</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>17.02.2026</td>
+        <td>13:32 </td>
+        <td class="rr">3 160 000,0</td>
+        <td class="rr">15,5196</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>10.02.2026</td>
+        <td>13:29 </td>
+        <td class="rr">3 230 000,0</td>
+        <td class="rr">16,0234</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>1</td>
+        <td>10.02.2026</td>
+        <td>11:33 </td>
+        <td class="rr">1 450 000,0</td>
+        <td class="rr">16,0016</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>03.02.2026</td>
+        <td>13:31 </td>
+        <td class="rr">2 760 000,0</td>
+        <td class="rr">16,0303</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>27.01.2026</td>
+        <td>13:41 </td>
+        <td class="rr">3 380 000,0</td>
+        <td class="rr">16,1121</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>20.01.2026</td>
+        <td>13:34 </td>
+        <td class="rr">3 230 000,0</td>
+        <td class="rr">16,0267</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>13.01.2026</td>
+        <td>13:29 </td>
+        <td class="rr">3 310 000,0</td>
+        <td class="rr">16,0575</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>15</td>
+        <td>30.12.2025</td>
+        <td>13:39 </td>
+        <td class="rr">4 700 000,0</td>
+        <td class="rr">16,2045</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>6</td>
+        <td>23.12.2025</td>
+        <td>13:31 </td>
+        <td class="rr">3 630 000,0</td>
+        <td class="rr">16,0926</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>16.12.2025</td>
+        <td>13:57 </td>
+        <td class="rr">3 420 000,0</td>
+        <td class="rr">16,5023</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>09.12.2025</td>
+        <td>13:31 </td>
+        <td class="rr">3 180 000,0</td>
+        <td class="rr">16,5083</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>1</td>
+        <td>09.12.2025</td>
+        <td>11:30 </td>
+        <td class="rr">0,0</td>
+        <td class="rr"> — </td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>02.12.2025</td>
+        <td>13:34 </td>
+        <td class="rr">3 270 000,0</td>
+        <td class="rr">16,5124</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>25.11.2025</td>
+        <td>14:05 </td>
+        <td class="rr">2 850 000,0</td>
+        <td class="rr">16,5174</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>18.11.2025</td>
+        <td>13:30 </td>
+        <td class="rr">2 830 000,0</td>
+        <td class="rr">16,5181</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>11.11.2025</td>
+        <td>14:14 </td>
+        <td class="rr">2 310 000,0</td>
+        <td class="rr">16,5199</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>1</td>
+        <td>11.11.2025</td>
+        <td>11:27 </td>
+        <td class="rr">850 000,0</td>
+        <td class="rr">16,5058</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>05.11.2025</td>
+        <td>13:32 </td>
+        <td class="rr">2 120 000,0</td>
+        <td class="rr">16,5274</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>28.10.2025</td>
+        <td>13:30 </td>
+        <td class="rr">1 680 000,0</td>
+        <td class="rr">16,6101</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>21.10.2025</td>
+        <td>13:33 </td>
+        <td class="rr">590 000,0</td>
+        <td class="rr">17,0563</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>14.10.2025</td>
+        <td>13:31 </td>
+        <td class="rr">990 000,0</td>
+        <td class="rr">17,1268</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>07.10.2025</td>
+        <td>13:31 </td>
+        <td class="rr">1 460 000,0</td>
+        <td class="rr">17,1158</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>30.09.2025</td>
+        <td>13:28 </td>
+        <td class="rr">1 490 000,0</td>
+        <td class="rr">17,1258</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>23.09.2025</td>
+        <td>13:30 </td>
+        <td class="rr">1 300 000,0</td>
+        <td class="rr">17,1132</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>16.09.2025</td>
+        <td>13:26 </td>
+        <td class="rr">1 330 000,0</td>
+        <td class="rr">17,1198</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>09.09.2025</td>
+        <td>13:26 </td>
+        <td class="rr">747 044,5</td>
+        <td class="rr">18,0318</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>1</td>
+        <td>09.09.2025</td>
+        <td>11:27 </td>
+        <td class="rr">850 000,0</td>
+        <td class="rr">18,0009</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>02.09.2025</td>
+        <td>13:30 </td>
+        <td class="rr">560 000,0</td>
+        <td class="rr">18,1566</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>26.08.2025</td>
+        <td>13:33 </td>
+        <td class="rr">450 000,0</td>
+        <td class="rr">18,1799</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>19.08.2025</td>
+        <td>13:32 </td>
+        <td class="rr">310 000,0</td>
+        <td class="rr">18,2385</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>12.08.2025</td>
+        <td>13:32 </td>
+        <td class="rr">500 000,0</td>
+        <td class="rr">18,4893</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>05.08.2025</td>
+        <td>13:29 </td>
+        <td class="rr">1 600 000,0</td>
+        <td class="rr">18,3029</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>29.07.2025</td>
+        <td>13:32 </td>
+        <td class="rr">2 160 000,0</td>
+        <td class="rr">18,6072</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>22.07.2025</td>
+        <td>13:27 </td>
+        <td class="rr">685 544,8</td>
+        <td class="rr">20,0020</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>15.07.2025</td>
+        <td>13:26 </td>
+        <td class="rr">706 379,9</td>
+        <td class="rr">20,0193</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>08.07.2025</td>
+        <td>13:38 </td>
+        <td class="rr">1 010 000,0</td>
+        <td class="rr">20,2391</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>01.07.2025</td>
+        <td>13:26 </td>
+        <td class="rr">1 020 000,0</td>
+        <td class="rr">20,2415</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>24.06.2025</td>
+        <td>13:33 </td>
+        <td class="rr">1 090 000,0</td>
+        <td class="rr">20,2312</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>17.06.2025</td>
+        <td>13:29 </td>
+        <td class="rr">1 020 000,0</td>
+        <td class="rr">20,2298</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>10.06.2025</td>
+        <td>13:35 </td>
+        <td class="rr">920 000,0</td>
+        <td class="rr">20,2095</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>03.06.2025</td>
+        <td>13:32 </td>
+        <td class="rr">620 000,0</td>
+        <td class="rr">21,2077</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>27.05.2025</td>
+        <td>13:30 </td>
+        <td class="rr">200 000,0</td>
+        <td class="rr">21,2831</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>20.05.2025</td>
+        <td>13:30 </td>
+        <td class="rr">866 203,2</td>
+        <td class="rr">21,2553</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>13.05.2025</td>
+        <td>13:28 </td>
+        <td class="rr">1 040 000,0</td>
+        <td class="rr">21,1499</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>06.05.2025</td>
+        <td>13:29 </td>
+        <td class="rr">880 000,0</td>
+        <td class="rr">21,1519</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>29.04.2025</td>
+        <td>13:28 </td>
+        <td class="rr">200 000,0</td>
+        <td class="rr">21,3071</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>22.04.2025</td>
+        <td>13:26 </td>
+        <td class="rr">900 000,0</td>
+        <td class="rr">21,2682</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>15.04.2025</td>
+        <td>13:30 </td>
+        <td class="rr">1 770 000,0</td>
+        <td class="rr">21,2430</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>2</td>
+        <td>07.04.2025</td>
+        <td>11:48 </td>
+        <td class="rr">810 000,0</td>
+        <td class="rr">21,4357</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>4</td>
+        <td>27.03.2025</td>
+        <td>11:32 </td>
+        <td class="rr">1 500 000,0</td>
+        <td class="rr">21,2404</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>21</td>
+        <td>03.03.2025</td>
+        <td>13:31 </td>
+        <td class="rr">100 000,0</td>
+        <td class="rr">21,5001</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>21</td>
+        <td>24.02.2025</td>
+        <td>13:29 </td>
+        <td class="rr">250 000,0</td>
+        <td class="rr">21,3100</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>21</td>
+        <td>17.02.2025</td>
+        <td>13:30 </td>
+        <td class="rr">100 000,0</td>
+        <td class="rr">21,1100</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>21</td>
+        <td>10.02.2025</td>
+        <td>13:35 </td>
+        <td class="rr">200 000,0</td>
+        <td class="rr">21,1010</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>21</td>
+        <td>03.02.2025</td>
+        <td>14:10 </td>
+        <td class="rr">550 000,0</td>
+        <td class="rr">21,1000</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>21</td>
+        <td>27.01.2025</td>
+        <td>13:35 </td>
+        <td class="rr">200 000,0</td>
+        <td class="rr">21,1600</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>21</td>
+        <td>20.01.2025</td>
+        <td>13:32 </td>
+        <td class="rr">300 000,0</td>
+        <td class="rr">21,2100</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>21</td>
+        <td>13.01.2025</td>
+        <td>13:30 </td>
+        <td class="rr">850 000,0</td>
+        <td class="rr">21,1000</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>35</td>
+        <td>23.12.2024</td>
+        <td>16:45 </td>
+        <td class="rr">208 980,2</td>
+        <td class="rr">21,1011</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>35</td>
+        <td>16.12.2024</td>
+        <td>13:30 </td>
+        <td class="rr">319 514,9</td>
+        <td class="rr">21,1498</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>35</td>
+        <td>09.12.2024</td>
+        <td>13:31 </td>
+        <td class="rr">850 000,0</td>
+        <td class="rr">21,1001</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>21</td>
+        <td>02.12.2024</td>
+        <td>13:15 </td>
+        <td class="rr">0,0</td>
+        <td class="rr"> — </td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>21</td>
+        <td>25.11.2024</td>
+        <td>13:59 </td>
+        <td class="rr">51 010,0</td>
+        <td class="rr">21,5235</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>35</td>
+        <td>11.12.2023</td>
+        <td>13:36 </td>
+        <td class="rr">100 000,0</td>
+        <td class="rr">15,1500</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>28</td>
+        <td>13.11.2023</td>
+        <td>13:59 </td>
+        <td class="rr">100 000,0</td>
+        <td class="rr">15,1612</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>35</td>
+        <td>09.10.2023</td>
+        <td>13:28 </td>
+        <td class="rr">100 000,0</td>
+        <td class="rr">13,1507</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>364</td>
+        <td>09.10.2023</td>
+        <td>11:30 </td>
+        <td class="rr">0,0</td>
+        <td class="rr"> — </td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>28</td>
+        <td>11.09.2023</td>
+        <td>13:39 </td>
+        <td class="rr">100 000,0</td>
+        <td class="rr">12,2601</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>364</td>
+        <td>11.09.2023</td>
+        <td>11:25 </td>
+        <td class="rr">0,0</td>
+        <td class="rr"> — </td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>28</td>
+        <td>14.08.2023</td>
+        <td>13:30 </td>
+        <td class="rr">100 000,0</td>
+        <td class="rr">8,6923</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>28</td>
+        <td>17.07.2023</td>
+        <td>13:28 </td>
+        <td class="rr">100 000,0</td>
+        <td class="rr">7,6600</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>364</td>
+        <td>17.07.2023</td>
+        <td>13:28 </td>
+        <td class="rr">100 000,0</td>
+        <td class="rr">7,7500</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>28</td>
+        <td>19.06.2023</td>
+        <td>13:31 </td>
+        <td class="rr">300 000,0</td>
+        <td class="rr">7,6000</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>364</td>
+        <td>19.06.2023</td>
+        <td>11:29 </td>
+        <td class="rr">100 000,0</td>
+        <td class="rr">7,7500</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>35</td>
+        <td>15.05.2023</td>
+        <td>13:43 </td>
+        <td class="rr">500 000,0</td>
+        <td class="rr">7,6000</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>364</td>
+        <td>15.05.2023</td>
+        <td>11:33 </td>
+        <td class="rr">100 000,0</td>
+        <td class="rr">7,7500</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>28</td>
+        <td>17.04.2023</td>
+        <td>13:31 </td>
+        <td class="rr">851 475,6</td>
+        <td class="rr">7,6000</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>364</td>
+        <td>17.04.2023</td>
+        <td>11:27 </td>
+        <td class="rr">100 000,0</td>
+        <td class="rr">7,7500</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>28</td>
+        <td>20.03.2023</td>
+        <td>13:29 </td>
+        <td class="rr">1 000 000,0</td>
+        <td class="rr">7,6000</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>364</td>
+        <td>20.03.2023</td>
+        <td>11:27 </td>
+        <td class="rr">100 000,0</td>
+        <td class="rr">7,7500</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>35</td>
+        <td>13.02.2023</td>
+        <td>13:29 </td>
+        <td class="rr">1 000 000,0</td>
+        <td class="rr">7,6000</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>364</td>
+        <td>13.02.2023</td>
+        <td>11:36 </td>
+        <td class="rr">100 000,0</td>
+        <td class="rr">7,7500</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>35</td>
+        <td>09.01.2023</td>
+        <td>13:31 </td>
+        <td class="rr">1 500 000,0</td>
+        <td class="rr">7,6047</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>371</td>
+        <td>09.01.2023</td>
+        <td>11:27 </td>
+        <td class="rr">100 000,0</td>
+        <td class="rr">7,7500</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>35</td>
+        <td>05.12.2022</td>
+        <td>13:31 </td>
+        <td class="rr">1 000 000,0</td>
+        <td class="rr">7,6000</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>371</td>
+        <td>05.12.2022</td>
+        <td>11:31 </td>
+        <td class="rr">100 000,0</td>
+        <td class="rr">7,7501</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>28</td>
+        <td>07.11.2022</td>
+        <td>13:50 </td>
+        <td class="rr">1 391 999,8</td>
+        <td class="rr">7,6000</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>371</td>
+        <td>07.11.2022</td>
+        <td>11:43 </td>
+        <td class="rr">100 000,0</td>
+        <td class="rr">7,7510</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>28</td>
+        <td>10.10.2022</td>
+        <td>13:27 </td>
+        <td class="rr">100 000,0</td>
+        <td class="rr">7,6002</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>364</td>
+        <td>10.10.2022</td>
+        <td>11:31 </td>
+        <td class="rr">100 000,0</td>
+        <td class="rr">7,7501</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>28</td>
+        <td>12.09.2022</td>
+        <td>13:34 </td>
+        <td class="rr">20,0</td>
+        <td class="rr">8,1000</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>364</td>
+        <td>12.09.2022</td>
+        <td>11:39 </td>
+        <td class="rr">100 000,0</td>
+        <td class="rr">8,2501</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>28</td>
+        <td>15.08.2022</td>
+        <td>13:32 </td>
+        <td class="rr">3 420,0</td>
+        <td class="rr">8,1471</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>364</td>
+        <td>15.08.2022</td>
+        <td>11:29 </td>
+        <td class="rr">310,0</td>
+        <td class="rr">8,2500</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>28</td>
+        <td>18.07.2022</td>
+        <td>13:27 </td>
+        <td class="rr">20,0</td>
+        <td class="rr">9,6000</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>364</td>
+        <td>18.07.2022</td>
+        <td>11:26 </td>
+        <td class="rr">1 020,0</td>
+        <td class="rr">9,7500</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>28</td>
+        <td>20.06.2022</td>
+        <td>13:40 </td>
+        <td class="rr">100 000,0</td>
+        <td class="rr">9,6000</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>364</td>
+        <td>20.06.2022</td>
+        <td>11:26 </td>
+        <td class="rr">33,5</td>
+        <td class="rr">9,7500</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>35</td>
+        <td>16.05.2022</td>
+        <td>13:34 </td>
+        <td class="rr">100 000,0</td>
+        <td class="rr">14,1000</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>364</td>
+        <td>16.05.2022</td>
+        <td>11:28 </td>
+        <td class="rr">1 192,8</td>
+        <td class="rr">14,2500</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>11.05.2022</td>
+        <td>13:32 </td>
+        <td class="rr">200 000,0</td>
+        <td class="rr">14,3130</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>04.05.2022</td>
+        <td>13:31 </td>
+        <td class="rr">550 000,0</td>
+        <td class="rr">14,1891</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>26.04.2022</td>
+        <td>13:31 </td>
+        <td class="rr">689 173,8</td>
+        <td class="rr">17,0311</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>19.04.2022</td>
+        <td>13:28 </td>
+        <td class="rr">1 187 114,3</td>
+        <td class="rr">17,0297</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>28</td>
+        <td>18.04.2022</td>
+        <td>13:32 </td>
+        <td class="rr">20,0</td>
+        <td class="rr">17,1000</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>364</td>
+        <td>18.04.2022</td>
+        <td>11:33 </td>
+        <td class="rr">7 040,3</td>
+        <td class="rr">17,2500</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>12.04.2022</td>
+        <td>13:40 </td>
+        <td class="rr">760 000,0</td>
+        <td class="rr">17,1090</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>05.04.2022</td>
+        <td>13:29 </td>
+        <td class="rr">1 500 000,0</td>
+        <td class="rr">20,0170</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>1</td>
+        <td>05.04.2022</td>
+        <td>11:28 </td>
+        <td class="rr">209 543,3</td>
+        <td class="rr">20,0008</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>1</td>
+        <td>04.04.2022</td>
+        <td>11:32 </td>
+        <td class="rr">308 896,4</td>
+        <td class="rr">20,0005</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>3</td>
+        <td>01.04.2022</td>
+        <td>11:25 </td>
+        <td class="rr">310 786,0</td>
+        <td class="rr">20,0016</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>1</td>
+        <td>31.03.2022</td>
+        <td>11:33 </td>
+        <td class="rr">727 327,5</td>
+        <td class="rr">20,0063</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>1</td>
+        <td>30.03.2022</td>
+        <td>11:34 </td>
+        <td class="rr">1 000 000,0</td>
+        <td class="rr">20,0210</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>29.03.2022</td>
+        <td>13:33 </td>
+        <td class="rr">1 480 506,8</td>
+        <td class="rr">20,0154</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>1</td>
+        <td>29.03.2022</td>
+        <td>11:31 </td>
+        <td class="rr">534 188,0</td>
+        <td class="rr">20,0101</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>1</td>
+        <td>28.03.2022</td>
+        <td>11:48 </td>
+        <td class="rr">823 961,7</td>
+        <td class="rr">20,0051</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>3</td>
+        <td>25.03.2022</td>
+        <td>11:33 </td>
+        <td class="rr">622 758,1</td>
+        <td class="rr">20,0011</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>1</td>
+        <td>24.03.2022</td>
+        <td>11:38 </td>
+        <td class="rr">413 894,7</td>
+        <td class="rr">20,0092</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>1</td>
+        <td>23.03.2022</td>
+        <td>11:42 </td>
+        <td class="rr">796 122,2</td>
+        <td class="rr">20,0290</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>22.03.2022</td>
+        <td>13:31 </td>
+        <td class="rr">3 514 655,2</td>
+        <td class="rr">20,0277</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>1</td>
+        <td>22.03.2022</td>
+        <td>11:35 </td>
+        <td class="rr">1 401 382,0</td>
+        <td class="rr">20,0048</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>364</td>
+        <td>21.03.2022</td>
+        <td>15:32 </td>
+        <td class="rr">10 167,4</td>
+        <td class="rr">20,2537</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>28</td>
+        <td>21.03.2022</td>
+        <td>14:25 </td>
+        <td class="rr">11 158,6</td>
+        <td class="rr">20,1557</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>1</td>
+        <td>21.03.2022</td>
+        <td>11:25 </td>
+        <td class="rr">1 709 713,3</td>
+        <td class="rr">20,0042</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>3</td>
+        <td>18.03.2022</td>
+        <td>11:31 </td>
+        <td class="rr">1 964 966,9</td>
+        <td class="rr">20,0034</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>1</td>
+        <td>17.03.2022</td>
+        <td>11:32 </td>
+        <td class="rr">1 940 310,0</td>
+        <td class="rr">20,0064</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>1</td>
+        <td>16.03.2022</td>
+        <td>12:11 </td>
+        <td class="rr">2 045 150,4</td>
+        <td class="rr">20,0084</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>15.03.2022</td>
+        <td>13:31 </td>
+        <td class="rr">3 000 000,0</td>
+        <td class="rr">20,0353</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>1</td>
+        <td>15.03.2022</td>
+        <td>11:31 </td>
+        <td class="rr">2 439 210,3</td>
+        <td class="rr">20,0014</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>1</td>
+        <td>14.03.2022</td>
+        <td>11:30 </td>
+        <td class="rr">2 104 271,1</td>
+        <td class="rr">20,0017</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>3</td>
+        <td>11.03.2022</td>
+        <td>11:28 </td>
+        <td class="rr">1 990 318,4</td>
+        <td class="rr">20,0018</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>1</td>
+        <td>10.03.2022</td>
+        <td>11:29 </td>
+        <td class="rr">2 107 634,0</td>
+        <td class="rr">20,0017</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>09.03.2022</td>
+        <td>13:36 </td>
+        <td class="rr">3 000 000,0</td>
+        <td class="rr">20,0031</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>1</td>
+        <td>09.03.2022</td>
+        <td>11:31 </td>
+        <td class="rr">1 634 617,8</td>
+        <td class="rr">20,0087</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>5</td>
+        <td>04.03.2022</td>
+        <td>13:32 </td>
+        <td class="rr">678 701,3</td>
+        <td class="rr">20,0155</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>1</td>
+        <td>03.03.2022</td>
+        <td>11:33 </td>
+        <td class="rr">513 900,2</td>
+        <td class="rr">20,0108</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>01.03.2022</td>
+        <td>13:55 </td>
+        <td class="rr">4 141 630,2</td>
+        <td class="rr">20,0011</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>1</td>
+        <td>01.03.2022</td>
+        <td>11:30 </td>
+        <td class="rr">2 394 983,5</td>
+        <td class="rr">20,0109</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>1</td>
+        <td>28.02.2022</td>
+        <td>11:31 </td>
+        <td class="rr">3 037 544,9</td>
+        <td class="rr">20,0051</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>3</td>
+        <td>25.02.2022</td>
+        <td>11:33 </td>
+        <td class="rr">1 929 161,6</td>
+        <td class="rr">9,5454</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>1</td>
+        <td>24.02.2022</td>
+        <td>11:42 </td>
+        <td class="rr">874 085,5</td>
+        <td class="rr">9,7209</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>35</td>
+        <td>14.02.2022</td>
+        <td>13:31 </td>
+        <td class="rr">100 000,0</td>
+        <td class="rr">9,9000</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>364</td>
+        <td>14.02.2022</td>
+        <td>11:27 </td>
+        <td class="rr">20,0</td>
+        <td class="rr">9,7500</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>35</td>
+        <td>10.01.2022</td>
+        <td>13:25 </td>
+        <td class="rr">30 010,0</td>
+        <td class="rr">8,9001</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>364</td>
+        <td>10.01.2022</td>
+        <td>11:34 </td>
+        <td class="rr">100 000,0</td>
+        <td class="rr">8,7705</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>35</td>
+        <td>06.12.2021</td>
+        <td>13:31 </td>
+        <td class="rr">100 000,0</td>
+        <td class="rr">7,9252</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>364</td>
+        <td>06.12.2021</td>
+        <td>11:43 </td>
+        <td class="rr">20,0</td>
+        <td class="rr">7,7500</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>28</td>
+        <td>08.11.2021</td>
+        <td>13:30 </td>
+        <td class="rr">100 000,0</td>
+        <td class="rr">7,6301</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>364</td>
+        <td>08.11.2021</td>
+        <td>11:45 </td>
+        <td class="rr">270,0</td>
+        <td class="rr">7,7500</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>28</td>
+        <td>11.10.2021</td>
+        <td>13:28 </td>
+        <td class="rr">100 000,0</td>
+        <td class="rr">7,0825</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>364</td>
+        <td>11.10.2021</td>
+        <td>11:40 </td>
+        <td class="rr">20,0</td>
+        <td class="rr">7,0000</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>28</td>
+        <td>13.09.2021</td>
+        <td>13:38 </td>
+        <td class="rr">60 000,0</td>
+        <td class="rr">6,8517</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>364</td>
+        <td>13.09.2021</td>
+        <td>11:30 </td>
+        <td class="rr">20,0</td>
+        <td class="rr">7,0000</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>28</td>
+        <td>16.08.2021</td>
+        <td>13:39 </td>
+        <td class="rr">100 000,0</td>
+        <td class="rr">6,6030</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>364</td>
+        <td>16.08.2021</td>
+        <td>11:37 </td>
+        <td class="rr">20,0</td>
+        <td class="rr">6,7500</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>28</td>
+        <td>19.07.2021</td>
+        <td>13:31 </td>
+        <td class="rr">100 000,0</td>
+        <td class="rr">5,8303</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>364</td>
+        <td>19.07.2021</td>
+        <td>11:26 </td>
+        <td class="rr">20,0</td>
+        <td class="rr">5,7500</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>28</td>
+        <td>21.06.2021</td>
+        <td>13:37 </td>
+        <td class="rr">100 000,0</td>
+        <td class="rr">5,6000</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>364</td>
+        <td>21.06.2021</td>
+        <td>11:23 </td>
+        <td class="rr">0,0</td>
+        <td class="rr"> — </td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>35</td>
+        <td>17.05.2021</td>
+        <td>13:32 </td>
+        <td class="rr">100 000,0</td>
+        <td class="rr">5,1000</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>364</td>
+        <td>17.05.2021</td>
+        <td>11:21 </td>
+        <td class="rr">0,0</td>
+        <td class="rr"> — </td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>28</td>
+        <td>19.04.2021</td>
+        <td>13:49 </td>
+        <td class="rr">100 000,0</td>
+        <td class="rr">4,6000</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>364</td>
+        <td>19.04.2021</td>
+        <td>11:40 </td>
+        <td class="rr">1 161,6</td>
+        <td class="rr">4,7500</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>28</td>
+        <td>22.03.2021</td>
+        <td>13:28 </td>
+        <td class="rr">50 010,0</td>
+        <td class="rr">4,6000</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>364</td>
+        <td>22.03.2021</td>
+        <td>11:33 </td>
+        <td class="rr">5 166,1</td>
+        <td class="rr">4,9032</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>35</td>
+        <td>15.02.2021</td>
+        <td>13:39 </td>
+        <td class="rr">50 010,0</td>
+        <td class="rr">4,3500</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>364</td>
+        <td>15.02.2021</td>
+        <td>11:25 </td>
+        <td class="rr">0,0</td>
+        <td class="rr"> — </td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>35</td>
+        <td>11.01.2021</td>
+        <td>13:29 </td>
+        <td class="rr">1 102 156,3</td>
+        <td class="rr">4,3500</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>364</td>
+        <td>11.01.2021</td>
+        <td>11:45 </td>
+        <td class="rr">10 310,0</td>
+        <td class="rr">4,5000</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>35</td>
+        <td>07.12.2020</td>
+        <td>13:39 </td>
+        <td class="rr">806 845,0</td>
+        <td class="rr">4,3501</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>364</td>
+        <td>07.12.2020</td>
+        <td>12:00 </td>
+        <td class="rr">10 525,7</td>
+        <td class="rr">4,7123</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>28</td>
+        <td>09.11.2020</td>
+        <td>13:32 </td>
+        <td class="rr">1 200 020,0</td>
+        <td class="rr">4,3500</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>364</td>
+        <td>09.11.2020</td>
+        <td>11:25 </td>
+        <td class="rr">0,0</td>
+        <td class="rr"> — </td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>28</td>
+        <td>12.10.2020</td>
+        <td>13:49 </td>
+        <td class="rr">600 010,0</td>
+        <td class="rr">4,3500</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>364</td>
+        <td>12.10.2020</td>
+        <td>11:42 </td>
+        <td class="rr">20 010,0</td>
+        <td class="rr">4,5000</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>28</td>
+        <td>14.09.2020</td>
+        <td>13:21 </td>
+        <td class="rr">0,0</td>
+        <td class="rr"> — </td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>364</td>
+        <td>14.09.2020</td>
+        <td>11:29 </td>
+        <td class="rr">0,0</td>
+        <td class="rr"> — </td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>28</td>
+        <td>17.08.2020</td>
+        <td>13:19 </td>
+        <td class="rr">0,0</td>
+        <td class="rr"> — </td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>364</td>
+        <td>17.08.2020</td>
+        <td>11:28 </td>
+        <td class="rr">0,0</td>
+        <td class="rr"> — </td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>28</td>
+        <td>20.07.2020</td>
+        <td>13:18 </td>
+        <td class="rr">0,0</td>
+        <td class="rr"> — </td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>364</td>
+        <td>20.07.2020</td>
+        <td>11:19 </td>
+        <td class="rr">0,0</td>
+        <td class="rr"> — </td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>29</td>
+        <td>22.06.2020</td>
+        <td>13:20 </td>
+        <td class="rr">0,0</td>
+        <td class="rr"> — </td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>365</td>
+        <td>22.06.2020</td>
+        <td>12:34 </td>
+        <td class="rr">5 100,0</td>
+        <td class="rr">4,7500</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>28</td>
+        <td>25.05.2020</td>
+        <td>11:18 </td>
+        <td class="rr">0,0</td>
+        <td class="rr"> — </td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>6</td>
+        <td>06.05.2020</td>
+        <td>11:29 </td>
+        <td class="rr">779 845,0</td>
+        <td class="rr">5,5126</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>6</td>
+        <td>30.04.2020</td>
+        <td>11:37 </td>
+        <td class="rr">500 000,0</td>
+        <td class="rr">5,5901</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>2</td>
+        <td>27.04.2020</td>
+        <td>11:39 </td>
+        <td class="rr">500 000,0</td>
+        <td class="rr">5,5019</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>3</td>
+        <td>24.04.2020</td>
+        <td>11:32 </td>
+        <td class="rr">153 926,6</td>
+        <td class="rr">6,0021</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>2</td>
+        <td>06.04.2020</td>
+        <td>11:33 </td>
+        <td class="rr">424 706,8</td>
+        <td class="rr">6,1320</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>6</td>
+        <td>31.03.2020</td>
+        <td>11:35 </td>
+        <td class="rr">368 892,3</td>
+        <td class="rr">6,0033</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>30.03.2020</td>
+        <td>11:57 </td>
+        <td class="rr">500 000,0</td>
+        <td class="rr">6,1643</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>1</td>
+        <td>19.03.2020</td>
+        <td>11:34 </td>
+        <td class="rr">250 180,1</td>
+        <td class="rr">6,0493</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>3</td>
+        <td>13.03.2020</td>
+        <td>11:33 </td>
+        <td class="rr">79 958,0</td>
+        <td class="rr">6,1512</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>1</td>
+        <td>10.03.2020</td>
+        <td>11:35 </td>
+        <td class="rr">500 000,0</td>
+        <td class="rr">6,0390</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>2</td>
+        <td>30.01.2017</td>
+        <td>11:43 </td>
+        <td class="rr">270 000,0</td>
+        <td class="rr">10,2320</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>20.09.2016</td>
+        <td>13:47 </td>
+        <td class="rr">620 000,0</td>
+        <td class="rr">10,2052</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>23.08.2016</td>
+        <td>13:32 </td>
+        <td class="rr">320 000,0</td>
+        <td class="rr">10,9585</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>16.08.2016</td>
+        <td>13:39 </td>
+        <td class="rr">100 000,0</td>
+        <td class="rr">11,4815</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>02.08.2016</td>
+        <td>13:28 </td>
+        <td class="rr">10 000,0</td>
+        <td class="rr">11,6959</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>26.07.2016</td>
+        <td>13:29 </td>
+        <td class="rr">480 000,0</td>
+        <td class="rr">10,8308</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>19.07.2016</td>
+        <td>13:30 </td>
+        <td class="rr">529 253,4</td>
+        <td class="rr">10,8696</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>12.07.2016</td>
+        <td>13:30 </td>
+        <td class="rr">120 000,0</td>
+        <td class="rr">11,5119</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>05.07.2016</td>
+        <td>13:33 </td>
+        <td class="rr">100 000,0</td>
+        <td class="rr">11,5018</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>28.06.2016</td>
+        <td>13:30 </td>
+        <td class="rr">370 000,0</td>
+        <td class="rr">11,2640</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>21.06.2016</td>
+        <td>13:30 </td>
+        <td class="rr">360 000,0</td>
+        <td class="rr">11,2432</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>14.06.2016</td>
+        <td>13:30 </td>
+        <td class="rr">150 000,0</td>
+        <td class="rr">11,4529</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>07.06.2016</td>
+        <td>13:36 </td>
+        <td class="rr">180 000,0</td>
+        <td class="rr">11,9321</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>31.05.2016</td>
+        <td>13:29 </td>
+        <td class="rr">150 000,0</td>
+        <td class="rr">11,9505</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>24.05.2016</td>
+        <td>13:30 </td>
+        <td class="rr">610 000,0</td>
+        <td class="rr">11,4731</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>17.05.2016</td>
+        <td>13:35 </td>
+        <td class="rr">430 000,0</td>
+        <td class="rr">11,4623</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>10.05.2016</td>
+        <td>13:30 </td>
+        <td class="rr">210 000,0</td>
+        <td class="rr">11,4927</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>29.04.2016</td>
+        <td>13:32 </td>
+        <td class="rr">410 000,0</td>
+        <td class="rr">11,2924</td>
+        <td>S5  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>26.04.2016</td>
+        <td>13:43 </td>
+        <td class="rr">431 064,2</td>
+        <td class="rr">11,3323</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>19.04.2016</td>
+        <td>13:34 </td>
+        <td class="rr">540 000,0</td>
+        <td class="rr">11,3512</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>12.04.2016</td>
+        <td>14:32 </td>
+        <td class="rr">250 000,0</td>
+        <td class="rr">11,7253</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>05.04.2016</td>
+        <td>13:30 </td>
+        <td class="rr">220 000,0</td>
+        <td class="rr">11,8466</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>29.03.2016</td>
+        <td>13:35 </td>
+        <td class="rr">660 000,0</td>
+        <td class="rr">11,5995</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>22.03.2016</td>
+        <td>13:37 </td>
+        <td class="rr">800 000,0</td>
+        <td class="rr">11,5334</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>15.03.2016</td>
+        <td>14:19 </td>
+        <td class="rr">670 000,0</td>
+        <td class="rr">11,6965</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>04.03.2016</td>
+        <td>13:40 </td>
+        <td class="rr">440 000,0</td>
+        <td class="rr">11,7805</td>
+        <td>S5  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>01.03.2016</td>
+        <td>13:33 </td>
+        <td class="rr">430 000,0</td>
+        <td class="rr">11,6856</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>20.02.2016</td>
+        <td>13:33 </td>
+        <td class="rr">490 000,0</td>
+        <td class="rr">11,6209</td>
+        <td>S4  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>16.02.2016</td>
+        <td>13:41 </td>
+        <td class="rr">540 000,0</td>
+        <td class="rr">11,4951</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>09.02.2016</td>
+        <td>13:37 </td>
+        <td class="rr">380 000,0</td>
+        <td class="rr">11,7468</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>02.02.2016</td>
+        <td>13:32 </td>
+        <td class="rr">100 000,0</td>
+        <td class="rr">12,0039</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>26.01.2016</td>
+        <td>13:58 </td>
+        <td class="rr">770 000,0</td>
+        <td class="rr">11,9140</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>19.01.2016</td>
+        <td>13:31 </td>
+        <td class="rr">620 000,0</td>
+        <td class="rr">11,9073</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>12.01.2016</td>
+        <td>13:34 </td>
+        <td class="rr">840 000,0</td>
+        <td class="rr">11,8556</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>14</td>
+        <td>29.12.2015</td>
+        <td>13:31 </td>
+        <td class="rr">1 442 081,6</td>
+        <td class="rr">11,6007</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>22.12.2015</td>
+        <td>13:31 </td>
+        <td class="rr">1 315 514,2</td>
+        <td class="rr">11,8080</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>15.12.2015</td>
+        <td>13:34 </td>
+        <td class="rr">1 000 000,0</td>
+        <td class="rr">11,8405</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>08.12.2015</td>
+        <td>13:27 </td>
+        <td class="rr">750 000,0</td>
+        <td class="rr">11,8434</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>01.12.2015</td>
+        <td>13:30 </td>
+        <td class="rr">550 000,0</td>
+        <td class="rr">11,8442</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>24.11.2015</td>
+        <td>13:29 </td>
+        <td class="rr">950 000,0</td>
+        <td class="rr">11,7731</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>17.11.2015</td>
+        <td>13:31 </td>
+        <td class="rr">990 000,0</td>
+        <td class="rr">11,7681</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>10.11.2015</td>
+        <td>13:28 </td>
+        <td class="rr">770 000,0</td>
+        <td class="rr">11,7838</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>6</td>
+        <td>03.11.2015</td>
+        <td>13:28 </td>
+        <td class="rr">570 000,0</td>
+        <td class="rr">11,8557</td>
+        <td>S2  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>8</td>
+        <td>27.10.2015</td>
+        <td>13:31 </td>
+        <td class="rr">1 090 000,0</td>
+        <td class="rr">11,7180</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>20.10.2015</td>
+        <td>13:32 </td>
+        <td class="rr">1 160 000,0</td>
+        <td class="rr">11,7315</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>13.10.2015</td>
+        <td>15:05 </td>
+        <td class="rr">1 030 000,0</td>
+        <td class="rr">11,7024</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>06.10.2015</td>
+        <td>13:32 </td>
+        <td class="rr">730 000,0</td>
+        <td class="rr">11,7666</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>29.09.2015</td>
+        <td>13:38 </td>
+        <td class="rr">910 000,0</td>
+        <td class="rr">11,7308</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>22.09.2015</td>
+        <td>13:28 </td>
+        <td class="rr">1 440 000,0</td>
+        <td class="rr">11,6324</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>15.09.2015</td>
+        <td>13:30 </td>
+        <td class="rr">1 100 000,0</td>
+        <td class="rr">11,5950</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>08.09.2015</td>
+        <td>13:31 </td>
+        <td class="rr">950 000,0</td>
+        <td class="rr">11,5711</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>01.09.2015</td>
+        <td>13:35 </td>
+        <td class="rr">730 000,0</td>
+        <td class="rr">11,6120</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>25.08.2015</td>
+        <td>13:35 </td>
+        <td class="rr">1 230 000,0</td>
+        <td class="rr">11,4867</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>18.08.2015</td>
+        <td>13:32 </td>
+        <td class="rr">1 080 000,0</td>
+        <td class="rr">11,5668</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>11.08.2015</td>
+        <td>13:36 </td>
+        <td class="rr">900 000,0</td>
+        <td class="rr">11,5813</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>04.08.2015</td>
+        <td>13:28 </td>
+        <td class="rr">1 120 000,0</td>
+        <td class="rr">11,5412</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>28.07.2015</td>
+        <td>13:30 </td>
+        <td class="rr">1 590 000,0</td>
+        <td class="rr">12,0098</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>21.07.2015</td>
+        <td>13:37 </td>
+        <td class="rr">1 620 000,0</td>
+        <td class="rr">12,0342</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>14.07.2015</td>
+        <td>13:31 </td>
+        <td class="rr">1 230 000,0</td>
+        <td class="rr">12,0619</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>07.07.2015</td>
+        <td>13:32 </td>
+        <td class="rr">1 370 000,0</td>
+        <td class="rr">12,0440</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>30.06.2015</td>
+        <td>13:33 </td>
+        <td class="rr">1 450 000,0</td>
+        <td class="rr">12,1121</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>23.06.2015</td>
+        <td>13:31 </td>
+        <td class="rr">1 570 000,0</td>
+        <td class="rr">12,0137</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>16.06.2015</td>
+        <td>13:31 </td>
+        <td class="rr">1 700 000,0</td>
+        <td class="rr">11,9081</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>09.06.2015</td>
+        <td>13:32 </td>
+        <td class="rr">1 580 000,0</td>
+        <td class="rr">12,8966</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>1</td>
+        <td>08.06.2015</td>
+        <td>11:32 </td>
+        <td class="rr">260 000,0</td>
+        <td class="rr">13,0735</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>3</td>
+        <td>05.06.2015</td>
+        <td>11:35 </td>
+        <td class="rr">200 000,0</td>
+        <td class="rr">13,0240</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>02.06.2015</td>
+        <td>13:32 </td>
+        <td class="rr">1 290 000,0</td>
+        <td class="rr">12,8281</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>26.05.2015</td>
+        <td>13:33 </td>
+        <td class="rr">1 780 000,0</td>
+        <td class="rr">12,7179</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>19.05.2015</td>
+        <td>13:38 </td>
+        <td class="rr">2 170 000,0</td>
+        <td class="rr">12,6662</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>12.05.2015</td>
+        <td>13:33 </td>
+        <td class="rr">1 620 000,0</td>
+        <td class="rr">12,7163</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>05.05.2015</td>
+        <td>13:49 </td>
+        <td class="rr">2 241 441,1</td>
+        <td class="rr">12,6646</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>1</td>
+        <td>29.04.2015</td>
+        <td>11:28 </td>
+        <td class="rr">133 954,5</td>
+        <td class="rr">14,1337</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>28.04.2015</td>
+        <td>13:32 </td>
+        <td class="rr">2 127 797,9</td>
+        <td class="rr">14,1756</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>2</td>
+        <td>27.04.2015</td>
+        <td>11:33 </td>
+        <td class="rr">101 562,8</td>
+        <td class="rr">14,2019</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>21.04.2015</td>
+        <td>13:42 </td>
+        <td class="rr">2 360 000,0</td>
+        <td class="rr">14,2354</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>2</td>
+        <td>20.04.2015</td>
+        <td>11:37 </td>
+        <td class="rr">230 000,0</td>
+        <td class="rr">14,3658</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>14.04.2015</td>
+        <td>13:50 </td>
+        <td class="rr">2 060 000,0</td>
+        <td class="rr">14,2231</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>07.04.2015</td>
+        <td>13:32 </td>
+        <td class="rr">1 451 899,7</td>
+        <td class="rr">14,2557</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>31.03.2015</td>
+        <td>13:45 </td>
+        <td class="rr">1 650 000,0</td>
+        <td class="rr">14,3806</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>2</td>
+        <td>30.03.2015</td>
+        <td>11:44 </td>
+        <td class="rr">340 000,0</td>
+        <td class="rr">14,3610</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>1</td>
+        <td>26.03.2015</td>
+        <td>11:32 </td>
+        <td class="rr">180 000,0</td>
+        <td class="rr">14,5130</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>24.03.2015</td>
+        <td>13:34 </td>
+        <td class="rr">1 570 000,0</td>
+        <td class="rr">14,3721</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>1</td>
+        <td>19.03.2015</td>
+        <td>11:33 </td>
+        <td class="rr">170 000,0</td>
+        <td class="rr">14,5026</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>17.03.2015</td>
+        <td>13:32 </td>
+        <td class="rr">1 450 000,0</td>
+        <td class="rr">14,4327</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>10.03.2015</td>
+        <td>13:31 </td>
+        <td class="rr">1 350 000,0</td>
+        <td class="rr">15,7224</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>03.03.2015</td>
+        <td>13:33 </td>
+        <td class="rr">1 330 000,0</td>
+        <td class="rr">15,7768</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>24.02.2015</td>
+        <td>13:43 </td>
+        <td class="rr">1 430 000,0</td>
+        <td class="rr">15,7404</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>17.02.2015</td>
+        <td>13:35 </td>
+        <td class="rr">1 450 000,0</td>
+        <td class="rr">15,7162</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>10.02.2015</td>
+        <td>13:33 </td>
+        <td class="rr">1 200 000,0</td>
+        <td class="rr">15,7314</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>03.02.2015</td>
+        <td>13:36 </td>
+        <td class="rr">1 300 000,0</td>
+        <td class="rr">15,6027</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>27.01.2015</td>
+        <td>13:31 </td>
+        <td class="rr">2 070 000,0</td>
+        <td class="rr">17,4435</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>20.01.2015</td>
+        <td>13:43 </td>
+        <td class="rr">2 200 000,0</td>
+        <td class="rr">17,3989</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>13.01.2015</td>
+        <td>13:32 </td>
+        <td class="rr">2 450 000,0</td>
+        <td class="rr">17,3014</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>15</td>
+        <td>30.12.2014</td>
+        <td>13:34 </td>
+        <td class="rr">2 690 000,0</td>
+        <td class="rr">17,3560</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>1</td>
+        <td>29.12.2014</td>
+        <td>11:43 </td>
+        <td class="rr">230 000,0</td>
+        <td class="rr">17,2022</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>3</td>
+        <td>26.12.2014</td>
+        <td>11:33 </td>
+        <td class="rr">215 646,1</td>
+        <td class="rr">17,0628</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>1</td>
+        <td>25.12.2014</td>
+        <td>11:35 </td>
+        <td class="rr">187 627,6</td>
+        <td class="rr">17,0470</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>1</td>
+        <td>24.12.2014</td>
+        <td>11:37 </td>
+        <td class="rr">167 639,3</td>
+        <td class="rr">17,0922</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>6</td>
+        <td>23.12.2014</td>
+        <td>13:32 </td>
+        <td class="rr">3 003 298,4</td>
+        <td class="rr">17,2505</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>1</td>
+        <td>23.12.2014</td>
+        <td>11:32 </td>
+        <td class="rr">332 243,4</td>
+        <td class="rr">17,1513</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>1</td>
+        <td>22.12.2014</td>
+        <td>11:28 </td>
+        <td class="rr">368 828,6</td>
+        <td class="rr">17,1215</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>3</td>
+        <td>19.12.2014</td>
+        <td>11:36 </td>
+        <td class="rr">487 731,3</td>
+        <td class="rr">17,1264</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>1</td>
+        <td>17.12.2014</td>
+        <td>11:40 </td>
+        <td class="rr">150 000,0</td>
+        <td class="rr">17,4883</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>16.12.2014</td>
+        <td>13:40 </td>
+        <td class="rr">3 101 253,8</td>
+        <td class="rr">17,3901</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>09.12.2014</td>
+        <td>13:34 </td>
+        <td class="rr">3 210 000,0</td>
+        <td class="rr">9,9776</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>02.12.2014</td>
+        <td>13:34 </td>
+        <td class="rr">2 770 000,0</td>
+        <td class="rr">9,8781</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>25.11.2014</td>
+        <td>14:12 </td>
+        <td class="rr">2 790 000,0</td>
+        <td class="rr">9,9392</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>1</td>
+        <td>25.11.2014</td>
+        <td>11:51 </td>
+        <td class="rr">200 000,0</td>
+        <td class="rr">10,1037</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>18.11.2014</td>
+        <td>13:37 </td>
+        <td class="rr">2 690 000,0</td>
+        <td class="rr">9,7191</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>11.11.2014</td>
+        <td>13:46 </td>
+        <td class="rr">2 695 000,0</td>
+        <td class="rr">9,6931</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>31.10.2014</td>
+        <td>14:03 </td>
+        <td class="rr">2 850 000,0</td>
+        <td class="rr">8,1326</td>
+        <td>S5  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>28.10.2014</td>
+        <td>13:32 </td>
+        <td class="rr">2 881 071,3</td>
+        <td class="rr">8,0993</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>2</td>
+        <td>27.10.2014</td>
+        <td>11:29 </td>
+        <td class="rr">120 329,0</td>
+        <td class="rr">8,0744</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>21.10.2014</td>
+        <td>13:39 </td>
+        <td class="rr">2 769 228,9</td>
+        <td class="rr">8,1338</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>2</td>
+        <td>20.10.2014</td>
+        <td>11:31 </td>
+        <td class="rr">320 000,0</td>
+        <td class="rr">8,1284</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>3</td>
+        <td>17.10.2014</td>
+        <td>11:38 </td>
+        <td class="rr">300 000,0</td>
+        <td class="rr">8,1183</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>14.10.2014</td>
+        <td>13:38 </td>
+        <td class="rr">2 380 000,0</td>
+        <td class="rr">8,1211</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>2</td>
+        <td>13.10.2014</td>
+        <td>11:33 </td>
+        <td class="rr">220 000,0</td>
+        <td class="rr">8,0770</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>07.10.2014</td>
+        <td>13:44 </td>
+        <td class="rr">1 990 000,0</td>
+        <td class="rr">8,1677</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>30.09.2014</td>
+        <td>13:36 </td>
+        <td class="rr">1 830 000,0</td>
+        <td class="rr">8,3173</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>23.09.2014</td>
+        <td>13:28 </td>
+        <td class="rr">2 400 000,0</td>
+        <td class="rr">8,1618</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>6</td>
+        <td>18.09.2014</td>
+        <td>11:37 </td>
+        <td class="rr">150 000,0</td>
+        <td class="rr">8,3988</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>16.09.2014</td>
+        <td>13:41 </td>
+        <td class="rr">2 150 000,0</td>
+        <td class="rr">8,1178</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>09.09.2014</td>
+        <td>13:36 </td>
+        <td class="rr">2 250 000,0</td>
+        <td class="rr">8,0858</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>02.09.2014</td>
+        <td>13:36 </td>
+        <td class="rr">2 100 000,0</td>
+        <td class="rr">8,0995</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>26.08.2014</td>
+        <td>13:33 </td>
+        <td class="rr">2 410 000,0</td>
+        <td class="rr">8,0823</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>19.08.2014</td>
+        <td>13:41 </td>
+        <td class="rr">2 579 496,5</td>
+        <td class="rr">8,0970</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>12.08.2014</td>
+        <td>13:31 </td>
+        <td class="rr">2 340 000,0</td>
+        <td class="rr">8,0904</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>05.08.2014</td>
+        <td>13:32 </td>
+        <td class="rr">2 290 000,0</td>
+        <td class="rr">8,0831</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>29.07.2014</td>
+        <td>13:34 </td>
+        <td class="rr">2 680 000,0</td>
+        <td class="rr">8,0838</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>2</td>
+        <td>28.07.2014</td>
+        <td>11:50 </td>
+        <td class="rr">67 812,6</td>
+        <td class="rr">8,0671</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>22.07.2014</td>
+        <td>13:55 </td>
+        <td class="rr">2 887 954,9</td>
+        <td class="rr">7,5671</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>1</td>
+        <td>22.07.2014</td>
+        <td>11:27 </td>
+        <td class="rr">115 366,1</td>
+        <td class="rr">7,5660</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>2</td>
+        <td>21.07.2014</td>
+        <td>11:58 </td>
+        <td class="rr">50 229,8</td>
+        <td class="rr">7,6443</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>15.07.2014</td>
+        <td>13:45 </td>
+        <td class="rr">2 703 206,9</td>
+        <td class="rr">7,5739</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>08.07.2014</td>
+        <td>13:33 </td>
+        <td class="rr">2 450 000,0</td>
+        <td class="rr">7,5892</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>01.07.2014</td>
+        <td>13:55 </td>
+        <td class="rr">2 250 000,0</td>
+        <td class="rr">7,5866</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>24.06.2014</td>
+        <td>13:34 </td>
+        <td class="rr">2 567 174,9</td>
+        <td class="rr">7,5573</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>17.06.2014</td>
+        <td>13:40 </td>
+        <td class="rr">2 480 000,0</td>
+        <td class="rr">7,5673</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>10.06.2014</td>
+        <td>13:30 </td>
+        <td class="rr">2 388 484,4</td>
+        <td class="rr">7,5725</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>03.06.2014</td>
+        <td>13:38 </td>
+        <td class="rr">2 366 405,6</td>
+        <td class="rr">7,5630</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>27.05.2014</td>
+        <td>13:41 </td>
+        <td class="rr">2 773 578,3</td>
+        <td class="rr">7,5613</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>20.05.2014</td>
+        <td>13:37 </td>
+        <td class="rr">3 144 980,0</td>
+        <td class="rr">7,5510</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>1</td>
+        <td>20.05.2014</td>
+        <td>11:32 </td>
+        <td class="rr">196 297,5</td>
+        <td class="rr">7,5984</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>13.05.2014</td>
+        <td>13:42 </td>
+        <td class="rr">2 950 000,0</td>
+        <td class="rr">7,5716</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>06.05.2014</td>
+        <td>14:28 </td>
+        <td class="rr">3 286 274,6</td>
+        <td class="rr">7,5430</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>29.04.2014</td>
+        <td>15:03 </td>
+        <td class="rr">3 148 207,7</td>
+        <td class="rr">7,5461</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>2</td>
+        <td>28.04.2014</td>
+        <td>11:37 </td>
+        <td class="rr">118 420,0</td>
+        <td class="rr">7,5812</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>22.04.2014</td>
+        <td>13:40 </td>
+        <td class="rr">3 163 667,2</td>
+        <td class="rr">7,0446</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>2</td>
+        <td>21.04.2014</td>
+        <td>11:39 </td>
+        <td class="rr">290 000,0</td>
+        <td class="rr">7,1050</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>15.04.2014</td>
+        <td>13:30 </td>
+        <td class="rr">2 800 000,0</td>
+        <td class="rr">7,0773</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>08.04.2014</td>
+        <td>13:29 </td>
+        <td class="rr">3 010 000,0</td>
+        <td class="rr">7,0379</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>01.04.2014</td>
+        <td>13:41 </td>
+        <td class="rr">2 868 853,8</td>
+        <td class="rr">7,0448</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>1</td>
+        <td>01.04.2014</td>
+        <td>11:42 </td>
+        <td class="rr">210 000,0</td>
+        <td class="rr">7,0749</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>1</td>
+        <td>31.03.2014</td>
+        <td>11:36 </td>
+        <td class="rr">198 448,9</td>
+        <td class="rr">7,0733</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>3</td>
+        <td>28.03.2014</td>
+        <td>11:30 </td>
+        <td class="rr">282 625,5</td>
+        <td class="rr">7,0411</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>1</td>
+        <td>27.03.2014</td>
+        <td>11:38 </td>
+        <td class="rr">200 000,0</td>
+        <td class="rr">7,0576</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>1</td>
+        <td>26.03.2014</td>
+        <td>11:34 </td>
+        <td class="rr">152 322,9</td>
+        <td class="rr">7,0779</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>25.03.2014</td>
+        <td>13:45 </td>
+        <td class="rr">2 757 265,1</td>
+        <td class="rr">7,0459</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>1</td>
+        <td>25.03.2014</td>
+        <td>11:43 </td>
+        <td class="rr">205 799,0</td>
+        <td class="rr">7,0638</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>1</td>
+        <td>24.03.2014</td>
+        <td>11:37 </td>
+        <td class="rr">120 919,4</td>
+        <td class="rr">7,2845</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>18.03.2014</td>
+        <td>13:28 </td>
+        <td class="rr">2 586 556,2</td>
+        <td class="rr">7,0856</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>1</td>
+        <td>18.03.2014</td>
+        <td>11:26 </td>
+        <td class="rr">390 000,0</td>
+        <td class="rr">7,0654</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>1</td>
+        <td>17.03.2014</td>
+        <td>11:38 </td>
+        <td class="rr">400 000,0</td>
+        <td class="rr">7,0784</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>3</td>
+        <td>14.03.2014</td>
+        <td>11:27 </td>
+        <td class="rr">90 000,0</td>
+        <td class="rr">7,4644</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>11.03.2014</td>
+        <td>13:48 </td>
+        <td class="rr">2 210 000,0</td>
+        <td class="rr">7,1358</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>04.03.2014</td>
+        <td>13:52 </td>
+        <td class="rr">2 371 297,7</td>
+        <td class="rr">7,1631</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>1</td>
+        <td>04.03.2014</td>
+        <td>11:54 </td>
+        <td class="rr">368 218,5</td>
+        <td class="rr">7,3351</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>25.02.2014</td>
+        <td>13:42 </td>
+        <td class="rr">2 220 000,0</td>
+        <td class="rr">5,5674</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>18.02.2014</td>
+        <td>13:39 </td>
+        <td class="rr">2 260 000,0</td>
+        <td class="rr">5,5532</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>11.02.2014</td>
+        <td>13:31 </td>
+        <td class="rr">2 180 000,0</td>
+        <td class="rr">5,5564</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>04.02.2014</td>
+        <td>13:32 </td>
+        <td class="rr">2 300 000,0</td>
+        <td class="rr">5,5526</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>3</td>
+        <td>31.01.2014</td>
+        <td>11:30 </td>
+        <td class="rr">40 000,0</td>
+        <td class="rr">6,3213</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>1</td>
+        <td>30.01.2014</td>
+        <td>11:35 </td>
+        <td class="rr">10 280,6</td>
+        <td class="rr">6,4017</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>1</td>
+        <td>29.01.2014</td>
+        <td>11:54 </td>
+        <td class="rr">60 000,0</td>
+        <td class="rr">6,1203</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>28.01.2014</td>
+        <td>13:29 </td>
+        <td class="rr">2 651 396,8</td>
+        <td class="rr">5,5183</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>1</td>
+        <td>28.01.2014</td>
+        <td>11:29 </td>
+        <td class="rr">314 929,4</td>
+        <td class="rr">5,5576</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>1</td>
+        <td>27.01.2014</td>
+        <td>11:27 </td>
+        <td class="rr">225 187,4</td>
+        <td class="rr">5,6383</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>3</td>
+        <td>24.01.2014</td>
+        <td>11:31 </td>
+        <td class="rr">30 406,4</td>
+        <td class="rr">6,3551</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>1</td>
+        <td>23.01.2014</td>
+        <td>11:40 </td>
+        <td class="rr">50 330,1</td>
+        <td class="rr">6,1988</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>1</td>
+        <td>22.01.2014</td>
+        <td>11:34 </td>
+        <td class="rr">10 043,4</td>
+        <td class="rr">6,3721</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>21.01.2014</td>
+        <td>13:47 </td>
+        <td class="rr">2 560 000,0</td>
+        <td class="rr">5,5183</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>1</td>
+        <td>21.01.2014</td>
+        <td>11:30 </td>
+        <td class="rr">370 000,0</td>
+        <td class="rr">5,5547</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>1</td>
+        <td>20.01.2014</td>
+        <td>11:31 </td>
+        <td class="rr">250 000,0</td>
+        <td class="rr">5,6316</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>3</td>
+        <td>17.01.2014</td>
+        <td>11:36 </td>
+        <td class="rr">90 000,0</td>
+        <td class="rr">5,7132</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>1</td>
+        <td>16.01.2014</td>
+        <td>11:29 </td>
+        <td class="rr">110 000,0</td>
+        <td class="rr">5,6191</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>1</td>
+        <td>15.01.2014</td>
+        <td>11:26 </td>
+        <td class="rr">214 630,7</td>
+        <td class="rr">5,6346</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>7</td>
+        <td>14.01.2014</td>
+        <td>13:33 </td>
+        <td class="rr">2 230 000,0</td>
+        <td class="rr">5,5222</td>
+        <td>S1  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>1</td>
+        <td>14.01.2014</td>
+        <td>11:29 </td>
+        <td class="rr">880 000,0</td>
+        <td class="rr">5,5490</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>1</td>
+        <td>13.01.2014</td>
+        <td>11:37 </td>
+        <td class="rr">830 000,0</td>
+        <td class="rr">5,5558</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>3</td>
+        <td>10.01.2014</td>
+        <td>11:31 </td>
+        <td class="rr">940 000,0</td>
+        <td class="rr">5,5320</td>
+        <td>S0  </td>
+      </tr>
+      <tr>
+        <td>Репо</td>
+        <td>1</td>
+        <td>09.01.2014</td>
+        <td>11:32 </td>
+        <td class="rr">974 053,7</td>
+        <td class="rr">5,5480</td>
+        <td>S0  </td>
+      </tr>
+    </table>
+  </div>
+</div>        <div class="document-regular">
+            <div class="document-regular_inner">
+                <div class="document-regular_top">
+                    <div class="document-regular_left_icon"></div>
+                </div>
+                <div class="body-2 document-regular_main">
+                    <div class="document-regular_texts">
+                        <div class="document-regular_name" data-toggle="">
+<a href="/hd_base/dirrepoauctionparam/">                                <span class="document-regular_name_visible">Параметры аукционов репо</span>
+</a>
+                                                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="document-regular">
+            <div class="document-regular_inner">
+                <div class="document-regular_top">
+                    <div class="document-regular_left_icon"></div>
+                </div>
+                <div class="body-2 document-regular_main">
+                    <div class="document-regular_texts">
+                        <div class="document-regular_name" data-toggle="">
+<a href="/oper_br/t_odm/repo_operations/">                                <span class="document-regular_name_visible">Операции репо Банка России</span>
+</a>
+                                                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+                    
+                    <!--/index-->
+                    
+    <div class="page-info">
+        <!--noindex-->
+        
+
+
+<div class="page-info_helpful"
+     data-page-feedback=""
+     data-feedback-url="/Content/PageInfo/RegisterFeedback">
+    <!--noindex-->
+    <div class="helpful" data-helpful="">
+        Страница была полезной?
+        <div class="helpful_btns">
+            <button class="helpful_btn _yes" data-helpful-btn="yes"><i class="helpful_icon"></i><span>Да</span></button>
+            <button class="helpful_btn _no" data-helpful-btn="no"><i class="helpful_icon"></i><span>Нет</span></button>
+        </div>
+    </div>
+    <!--/noindex-->
+</div>
+
+            <div class="page-info_last-update">Последнее обновление страницы: 26.05.2026</div>
+        <!--/noindex-->
+    </div>
+
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer" id="footer">
+    <div class="offsetMenu footer_margin-left">
+        <div class="footer_main">
+            <div class="col-md-23 col-xl-22 offset-md-1 offset-xl-2 footer-size">
+                <div class="footer_top">
+                    <a class="footer_logo" href="/"></a>
+                    <div class="footer_up gotoUp">
+                        <div class="footer_up_title">Наверх</div>
+                        <div class="footer_up_icon"></div>
+                    </div>
+                </div>
+                
+<div class="footer_contacts">
+<div class="footer_address">107016, Москва, ул. Неглинная, д.&nbsp;12, к. В, Банк
+России</div>
+<div class="footer_phones">
+<div class="footer_phone"><a class="footer_phone_val" href="tel:300">300</a><span>(круглосуточно, бесплатно для&nbsp;звонков с&nbsp;мобильных телефонов)</span></div>
+<div class="footer_phone"><a class="footer_phone_val" href="tel:88003003000">8&nbsp;800 300-30-00</a><span>(круглосуточно, бесплатно для&nbsp;звонков из&nbsp;регионов России)</span></div>
+<div class="footer_phone"><a class="footer_phone_val" href="tel:+74993003000">+7&nbsp;499 300-30-00</a><span>(круглосуточно, в&nbsp;соответствии с&nbsp;тарифами вашего оператора)</span></div>
+
+</div>
+</div>
+<div class="footer_main_block">
+<div class="footer_left-menu">
+<div class="footer_left-menu_item"><a href="/lk_uio/">Личный кабинет участника информационного обмена</a></div>
+<div class="footer_left-menu_item"><a href="/about_br/irp/">Отношения с&nbsp;инвесторами</a></div>
+<div class="footer_left-menu_item"><a href="/rbr/list_inside/">Перечень инсайдерской информации Банка России</a></div>
+<div class="footer_left-menu_item"><a href="/analytics/na_vr/">Официальное опубликование нормативных актов Банка России</a></div>
+<div class="footer_left-menu_item"><a href="/project_na/">Проекты нормативных актов Банка России</a></div>
+<div class="footer_left-menu_item"><a href="/other/holidays/">Перечень нерабочих праздничных дней и&nbsp;перенесенных выходных дней</a></div>
+</div>
+<div class="networks-circle footer_networks">
+<a class="networks-circle_item _vk" href="https://vk.com/cbr_official"></a>
+<a class="networks-circle_item _yt" href="https://www.youtube.com/user/BankofRussia"></a>
+<a class="networks-circle_item _tg" href="https://t.me/centralbank_russia" title="Telegram"></a>
+<a class="networks-circle_item _ydzen" href="https://dzen.ru/cbr" title="Яндекс Дзен"></a>
+<a class="networks-circle_item _ok" href="https://ok.ru/group/68858679787580" title="Одноклассники"></a>
+<a class="networks-circle_item _rt" href="https://rutube.ru/channel/23873201/" title="RUTUBE"></a>
+<a class="networks-circle_item _max" href="https://max.ru/cbr_official" title="Макс"></a>
+</div>
+</div>
+<div class="footer_menu">
+<div class="footer_menu_items">
+<div class="footer_menu_item"><a href="/about/">О&nbsp;сайте</a></div>
+<div class="footer_menu_item"><a href="/contacts/">Контакты</a></div>
+<div class="footer_menu_item"><a href="/about_br/anticor/">Противодействие коррупции</a></div>
+<div class="footer_menu_item"><a href="/development/">Технические ресурсы</a></div>
+</div>
+<a class="footer_menu_item _visually-impaired" href="#" title="Версия для слабовидящих">
+	<div class="footer_visually-impaired-icon"></div>
+	<div><span class="visually-impaired-on">Версия для&nbsp;слабовидящих</span><span class="visually-impaired-off">Обычная версия</span></div>
+</a>
+</div>
+
+            </div>
+        </div>
+        <div class="footer_bottom">
+            <div class="col-md-23 col-xl-23 offset-md-1 offset-xl-2 row footer_bottom-container">
+                <div class="footer_bottom_text col-md-11 col-xl-11">&#169; Банк России, 2000–2026.</div>
+<div class="footer_bottom_aic col-md-12 col-xl-11">Дизайн сайта — <a href="https://aic.ru" target="_blank"><img src="/common/images/icons/aic-logo.svg" /></a></div>
+
+            </div>
+        </div>
+    </div>
+</footer>
+
+    
+    
+
+        <div class="popup-cookies" data-popup-cookies>
+            <div class="popup-cookies_title">
+                На сайте Банка России используются файлы cookie
+            </div>
+            <div class="popup-cookies_subtitle">
+                Оставаясь на <a href="/">www.cbr.ru</a>, вы принимаете
+                <a href='/user_agreement/'>пользовательское соглашение</a>
+            </div>
+            <button class="btn _medium _blue " data-popup-cookies-btn>
+                Подтвердить
+            </button>
+        </div>
+
+    
+<!--[if IE 9]><script>$('body').addClass('ie9')</script><![endif]-->
+<script src="/Modules/Content/Scripts/PageInfo.js?v=v3116962712" type="text/javascript"></script>
+    <script type="text/javascript">
+        $(function () {
+            Content_PageInfo.init($('[data-page-feedback]'));
+        });
+    </script>
+
+
+
+</body>
+</html>
