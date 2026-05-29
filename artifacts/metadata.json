@@ -1,0 +1,98 @@
+{
+  "n_days": 5262,
+  "date_min": "2012-01-02",
+  "date_max": "2026-05-29",
+  "lsi_method": "nsvm_shap_adaptive_log_calibrated",
+  "n_auto_episodes": 25,
+  "lsi_smoothness": {
+    "std_day_diff": 4.609608571445451
+  },
+  "module_share_means": {
+    "M1": 17.661985845058375,
+    "M2": 6.755791273117685,
+    "M3": 7.950846334369176,
+    "M4": 5.474785655483933,
+    "M5": 2.9151080124157494
+  },
+  "lsi_quantiles": {
+    "q50": 42.74379651243704,
+    "q90": 80.55294334111277,
+    "q99": 96.14887305946996
+  },
+  "nsvm_best_params": {
+    "seq_len": 14,
+    "hidden_dim": 64,
+    "epochs": 30
+  },
+  "nsvm_cv_summary": {},
+  "holdout": {
+    "mae": 53.764846894837376,
+    "auc": NaN,
+    "n": 880
+  },
+  "models": {
+    "nsvm": {
+      "train_metrics": {
+        "mae": 1.9955628529823295,
+        "rmse": 6.538389600680814,
+        "r2": 0.746013075427446,
+        "n": 4382,
+        "roc_auc": 0.9773180117355691,
+        "pr_auc": 0.8900737111790379,
+        "precision_p90": 0.8132118451025057,
+        "recall_p90": 0.8132118451025057,
+        "f1_p90": 0.8132118451025057
+      },
+      "test_metrics": {
+        "mae": 4.893044812690391,
+        "rmse": 6.420191478717559,
+        "r2": 0.6885780282814187,
+        "n": 880,
+        "roc_auc": 0.9794105831037649,
+        "pr_auc": 0.8509328573300156,
+        "precision_p90": 0.75,
+        "recall_p90": 0.75,
+        "f1_p90": 0.75
+      },
+      "best_params": {
+        "seq_len": 14,
+        "hidden_dim": 64,
+        "epochs": 30
+      },
+      "best_iteration": 30,
+      "feature_importance": {
+        "m1_mad_spread": 0.03225806451612903,
+        "m1_mad_ruonia_spread": 0.03225806451612903,
+        "m1_flag_end_of_period": 0.03225806451612903,
+        "m1_mio_cusum": 0.03225806451612903,
+        "m2_mad_cover": 0.03225806451612903,
+        "m2_mad_rate_spread": 0.03225806451612903,
+        "m2_flag_high_demand": 0.03225806451612903,
+        "m2_flag_fine_tuning": 0.03225806451612903,
+        "m2_mio_cusum": 0.03225806451612903,
+        "m3_mad_cover_low": 0.03225806451612903,
+        "m3_mad_yield_spread": 0.03225806451612903,
+        "m3_flag_undersubscribed": 0.03225806451612903,
+        "m3_flag_oversubscribed": 0.03225806451612903,
+        "m3_mio_cusum": 0.03225806451612903,
+        "m4_mad_events_count": 0.03225806451612903,
+        "m4_flag_tax_peak_15": 0.03225806451612903,
+        "m4_flag_tax_peak_20": 0.03225806451612903,
+        "m4_flag_tax_peak_25": 0.03225806451612903,
+        "m4_flag_tax_peak_28": 0.03225806451612903,
+        "m4_flag_end_of_month": 0.03225806451612903,
+        "m4_flag_quarter_end": 0.03225806451612903,
+        "m4_flag_year_end": 0.03225806451612903,
+        "m4_flag_has_event": 0.03225806451612903,
+        "m4_flag_tax_week": 0.03225806451612903,
+        "m4_mio_cusum": 0.03225806451612903,
+        "m5_mad_treasury_drain": 0.03225806451612903,
+        "m5_mad_roskazna_drain": 0.03225806451612903,
+        "m5_flag_budget_drain": 0.03225806451612903,
+        "m5_flag_budget_drain_strong": 0.03225806451612903,
+        "m5_mio_cusum": 0.03225806451612903,
+        "m4_seasonal_factor": 0.03225806451612903
+      }
+    }
+  }
+}

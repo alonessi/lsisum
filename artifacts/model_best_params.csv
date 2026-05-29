@@ -1,0 +1,2 @@
+model,seq_len,hidden_dim,epochs,best_iteration
+nsvm,14,64,30,30
