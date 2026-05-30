@@ -8,29 +8,30 @@ from sklearn.base import BaseEstimator
 
 
 class NSVMArchitecture(nn.Module):
-    def __init__(self, input_dim, hidden_dim=64, seq_len=14):
+    def __init__(self, input_dim, hidden_dim=32, seq_len=14):  # Уменьшили размерность
         super().__init__()
         self.seq_len = seq_len
 
-        # Общий энкодер для формирования эмбеддинга рыночного состояния
         self.lstm = nn.LSTM(input_dim, hidden_dim, batch_first=True)
+        self.dropout = nn.Dropout(0.3)  # Жесткий дропаут для борьбы с зубрежкой
 
-        # Декодеры теперь выдают векторы размерности input_dim
         self.mean_head = nn.Sequential(
-            nn.Linear(hidden_dim, hidden_dim // 2),
+            nn.Linear(hidden_dim, hidden_dim),
             nn.ReLU(),
-            nn.Linear(hidden_dim // 2, input_dim)
+            self.dropout,
+            nn.Linear(hidden_dim, input_dim)
         )
         self.vol_head = nn.Sequential(
-            nn.Linear(hidden_dim, hidden_dim // 2),
+            nn.Linear(hidden_dim, hidden_dim),
             nn.ReLU(),
-            nn.Linear(hidden_dim // 2, input_dim)
+            self.dropout,
+            nn.Linear(hidden_dim, input_dim)
         )
 
     def forward(self, x):
-        # x shape: (batch, seq_len, features)
         out, _ = self.lstm(x)
-        last_step_hidden = out[:, -1, :]  # Берем скрытое состояние последнего шага
+        last_step_hidden = out[:, -1, :]
+        last_step_hidden = self.dropout(last_step_hidden)  # Прореживаем скрытое состояние
 
         mu = self.mean_head(last_step_hidden)
         log_var = self.vol_head(last_step_hidden)
@@ -38,7 +39,7 @@ class NSVMArchitecture(nn.Module):
 
 
 class NSVMAnomalyDetector(BaseEstimator):
-    """Unsupervised NSVM: оценивает вероятность (Negative Log-Likelihood) текущего состояния."""
+    """Unsupervised NSVM: Forecasting anomaly detector."""
 
     def __init__(self, seq_len=14, hidden_dim=64, epochs=30, lr=1e-3, batch_size=32, device="cpu"):
         self.seq_len = seq_len
@@ -50,11 +51,14 @@ class NSVMAnomalyDetector(BaseEstimator):
         self.model = None
 
     def _create_sequences(self, X):
-        X_seq = []
-        pad_size = self.seq_len - 1
+        # Строгое прогнозирование: чтобы предсказать X[i], берем историю ДО него
+        pad_size = self.seq_len
         X_padded = np.vstack([np.zeros((pad_size, X.shape[1])), X])
 
+        X_seq = []
         for i in range(len(X)):
+            # Берем seq_len шагов в прошлом. X_padded[i+pad_size] - это текущий X[i]
+            # Поэтому берем срез от i до i + seq_len
             X_seq.append(X_padded[i: i + self.seq_len])
 
         return torch.tensor(np.array(X_seq), dtype=torch.float32)
@@ -63,27 +67,29 @@ class NSVMAnomalyDetector(BaseEstimator):
         if isinstance(X, pd.DataFrame): X = X.values
 
         X_tensor = self._create_sequences(X)
-        dataset = TensorDataset(X_tensor)
+        target_tensor = torch.tensor(X, dtype=torch.float32)  # Истинный X_t
+
+        dataset = TensorDataset(X_tensor, target_tensor)
         loader = DataLoader(dataset, batch_size=self.batch_size, shuffle=True)
 
         self.model = NSVMArchitecture(input_dim=X.shape[1], hidden_dim=self.hidden_dim, seq_len=self.seq_len)
         self.model.to(self.device)
-        optimizer = optim.Adam(self.model.parameters(), lr=self.lr)
+        optimizer = optim.Adam(self.model.parameters(), lr=self.lr, weight_decay=1e-4)
 
         for epoch in range(self.epochs):
             self.model.train()
-            for (batch_X,) in loader:
-                batch_X = batch_X.to(self.device)
+            for batch_X, batch_target in loader:
+                batch_X, batch_target = batch_X.to(self.device), batch_target.to(self.device)
                 optimizer.zero_grad()
 
                 mu, log_var = self.model(batch_X)
+
+                # ЗАЩИТА ОТ КОЛЛАПСА ДИСПЕРСИИ И NaN
+                log_var = torch.clamp(log_var, min=-4.0, max=4.0)
                 var = torch.exp(log_var)
 
-                # Таргет - это сами фичи на последнем шаге окна
-                target = batch_X[:, -1, :]
-
-                # Многомерный NLL Loss
-                loss = 0.5 * torch.mean(log_var + ((target - mu) ** 2) / (var + 1e-6))
+                # NLL Loss
+                loss = 0.5 * torch.mean(log_var + ((batch_target - mu) ** 2) / var)
 
                 loss.backward()
                 optimizer.step()
@@ -91,20 +97,36 @@ class NSVMAnomalyDetector(BaseEstimator):
         return self
 
     def predict(self, X):
-        """Возвращает NLL (Anomaly Score) для каждого наблюдения."""
         if isinstance(X, pd.DataFrame): X = X.values
         self.model.eval()
         X_tensor = self._create_sequences(X).to(self.device)
+        target_tensor = torch.tensor(X, dtype=torch.float32).to(self.device)
 
         with torch.no_grad():
             mu, log_var = self.model(X_tensor)
+            log_var = torch.clamp(log_var, min=-4.0, max=4.0)
             var = torch.exp(log_var)
-            target = X_tensor[:, -1, :]
 
-            # Считаем NLL по каждому сэмплу (усредняем по фичам)
-            nll = 0.5 * torch.mean(log_var + ((target - mu) ** 2) / (var + 1e-6), dim=1)
+            nll = 0.5 * torch.mean(log_var + ((target_tensor - mu) ** 2) / var, dim=1)
 
         return nll.cpu().numpy()
+
+    def get_nll_components(self, X):
+        """Возвращает аналитический NLL для каждой фичи (используется для атрибуции вместо SHAP)."""
+        if isinstance(X, pd.DataFrame): X = X.values
+        self.model.eval()
+        X_tensor = self._create_sequences(X).to(self.device)
+        target_tensor = torch.tensor(X, dtype=torch.float32).to(self.device)
+
+        with torch.no_grad():
+            mu, log_var = self.model(X_tensor)
+            log_var = torch.clamp(log_var, min=-4.0, max=4.0)
+            var = torch.exp(log_var)
+
+            # Не усредняем по фичам, отдаем матрицу [samples, features]
+            nll_components = 0.5 * (log_var + ((target_tensor - mu) ** 2) / var)
+
+        return nll_components.cpu().numpy()
 
     def partial_fit(self, X, epochs=10, lr=1e-4):
         if self.model is None:
@@ -112,10 +134,11 @@ class NSVMAnomalyDetector(BaseEstimator):
 
         if isinstance(X, pd.DataFrame): X = X.values
         X_tensor = self._create_sequences(X)
-        dataset = TensorDataset(X_tensor)
+        target_tensor = torch.tensor(X, dtype=torch.float32)
+
+        dataset = TensorDataset(X_tensor, target_tensor)
         loader = DataLoader(dataset, batch_size=self.batch_size, shuffle=True)
 
-        # Морозим память (LSTM), обучаем только проекции
         for param in self.model.lstm.parameters():
             param.requires_grad = False
 
@@ -124,15 +147,15 @@ class NSVMAnomalyDetector(BaseEstimator):
 
         self.model.train()
         for epoch in range(epochs):
-            for (batch_X,) in loader:
-                batch_X = batch_X.to(self.device)
+            for batch_X, batch_target in loader:
+                batch_X, batch_target = batch_X.to(self.device), batch_target.to(self.device)
                 optimizer.zero_grad()
 
                 mu, log_var = self.model(batch_X)
+                log_var = torch.clamp(log_var, min=-4.0, max=4.0)
                 var = torch.exp(log_var)
-                target = batch_X[:, -1, :]
 
-                loss = 0.5 * torch.mean(log_var + ((target - mu) ** 2) / (var + 1e-6))
+                loss = 0.5 * torch.mean(log_var + ((batch_target - mu) ** 2) / var)
                 loss.backward()
                 optimizer.step()
 
