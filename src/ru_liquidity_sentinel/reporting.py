@@ -55,9 +55,6 @@ def plot_lsi(run: PipelineRun, path: Path) -> Path:
     ax.axhline(LSI_THRESHOLDS["green_max"], color="#2ecc71", lw=0.5, ls="--")
     ax.axhline(LSI_THRESHOLDS["yellow_max"], color="#ff4d4d", lw=0.5, ls="--")
 
-    # The LSI line is the log-calibrated NSVM prediction;
-    # there is nothing else to overlay (no parallel models).
-
     for name, start, end in run.config.backtest_episodes:
         ax.axvspan(pd.Timestamp(start), pd.Timestamp(end), color="grey", alpha=0.20)
 
@@ -164,8 +161,6 @@ _MODEL_COLORS = {
 }
 
 def plot_model_predictions(run: PipelineRun, path: Path) -> Optional[Path]:
-    """One big figure: per-model subplot of LSI predictions over the full timeline."""
-
     if run.models is None:
         return None
     preds = run.models.predictions_frame()
@@ -215,8 +210,6 @@ def plot_model_predictions(run: PipelineRun, path: Path) -> Optional[Path]:
 def plot_model_predictions_episode_zoom(
     run: PipelineRun, path: Path
 ) -> Optional[Path]:
-    """Zoom on the three TZ episodes for a tight visual comparison."""
-
     if run.models is None:
         return None
     preds = run.models.predictions_frame()
@@ -251,8 +244,6 @@ def plot_model_predictions_episode_zoom(
 
 
 def plot_model_metrics_table(run: PipelineRun, path: Path) -> Optional[Path]:
-    """Render the side-by-side metrics table as a PNG."""
-
     if run.models is None:
         return None
     df = run.models.metrics_table()
@@ -284,25 +275,18 @@ def plot_model_metrics_table(run: PipelineRun, path: Path) -> Optional[Path]:
     table.auto_set_font_size(False)
     table.set_fontsize(9)
     table.scale(1.0, 1.4)
-    ax.set_title("Aggregator model metrics — NSVM")
+    ax.set_title("Aggregator model metrics — NSVM (Unsupervised NLL)")
     return _save_fig(fig, path)
 
 
 def plot_cv_folds(run: PipelineRun, path: Path) -> Optional[Path]:
-    """Walk-forward CV: per-fold train/val MAE for the chosen hyper-params.
-
-    Shows the train and validation MAE achieved on each chronological fold
-    (only for the *winning* config of each model) so we can see whether
-    fold-by-fold generalisation is stable across time.
-    """
-
     if run.models is None:
         return None
     cv = run.models.cv_table()
     if cv.empty:
+        # Since we removed TimeSeriesSplit CV for the Unsupervised approach, this will be gracefully skipped.
         return None
 
-    # Keep only the winner config per model (by mean val_mae).
     winners = []
     for (model, params), grp in cv.groupby(["model", "params"]):
         winners.append({"model": model, "params": params, "val_mean": grp["val_mae"].mean()})
@@ -336,8 +320,6 @@ def plot_cv_folds(run: PipelineRun, path: Path) -> Optional[Path]:
 
 
 def plot_feature_importance(run: PipelineRun, path: Path) -> Optional[Path]:
-    """Top features per model — side-by-side."""
-
     if run.models is None:
         return None
     available = {
@@ -365,14 +347,8 @@ def plot_feature_importance(run: PipelineRun, path: Path) -> Optional[Path]:
 
 
 def plot_noise_breakdown(run: PipelineRun, path: Path) -> Path:
-    """Variance decomposition of Var(ΔLSI) into per-module + cross terms.
-
-    See :func:`aggregate.noise_breakdown` for the formula.
-    """
-
     nb = run.noise_breakdown.copy()
     if nb.empty:
-        # synthesise an empty axis to avoid breaking
         fig, ax = plt.subplots(figsize=(8, 4))
         ax.set_title("Noise breakdown — no data")
         return _save_fig(fig, path)
@@ -415,8 +391,6 @@ def plot_noise_breakdown(run: PipelineRun, path: Path) -> Path:
 
 
 def _annotate_corr(ax, mat: pd.DataFrame, fmt: str = "{:.2f}") -> None:
-    """Write each correlation value in the centre of its cell."""
-
     for i in range(mat.shape[0]):
         for j in range(mat.shape[1]):
             v = mat.iat[i, j]
@@ -439,8 +413,6 @@ def plot_correlation_matrix(
     path: Path,
     annotate: bool = True,
 ) -> Path:
-    """Generic correlation matrix plot with annotations."""
-
     if df.shape[1] < 2:
         fig, ax = plt.subplots(figsize=(4, 3))
         ax.set_title(f"{title} — too few columns")
@@ -464,8 +436,6 @@ def plot_correlation_matrix(
 def plot_module_correlation_matrices(
     run: PipelineRun, fdir: Path
 ) -> List[Path]:
-    """One correlation matrix per module (mad_scores ∪ flags ∪ mio_cusum)."""
-
     out: List[Path] = []
     for module in ("M1", "M2", "M3", "M4", "M5"):
         cols = module_columns(run.features, module)
@@ -485,16 +455,6 @@ def plot_module_correlation_matrices(
 
 
 def plot_global_correlation_matrix(run: PipelineRun, path: Path) -> Path:
-    """One global matrix: every mad_score / flag / mio_cusum + module sums.
-
-    The matrix mixes cross-module pairs so the user can see, e.g., that
-    M1 ``end_of_period`` flag is uncorrelated with M3 ``cover_low``,
-    while M5 ``deficit`` strongly co-moves with M2 ``volume``.
-
-    The "module sum" columns are the transparent ``score_M{n}`` series
-    (mad-mean + flag count + mio CUSUM, in [0, 100]).
-    """
-
     parts: List[pd.DataFrame] = []
     for module in ("M1", "M2", "M3", "M4", "M5"):
         cols = module_columns(run.features, module)
@@ -572,6 +532,7 @@ def write_all_reports(run: PipelineRun, cfg: PipelineConfig | None = None) -> Li
 
     out.append(export_alerts_table(run, tdir / "top_alerts.csv"))
 
+    # HERE IS THE FIX: Removed reference to supervised holdout metrics.
     summary_rows = [
         {"metric": "n_days", "value": int(run.features.shape[0])},
         {"metric": "lsi_q50", "value": run.metadata["lsi_quantiles"]["q50"]},
@@ -582,10 +543,8 @@ def write_all_reports(run: PipelineRun, cfg: PipelineConfig | None = None) -> Li
             "value": run.metadata["lsi_smoothness"]["std_day_diff"],
         },
         {"metric": "n_auto_episodes", "value": run.metadata["n_auto_episodes"]},
-        {"metric": "holdout_mae", "value": run.holdout.get("mae", float("nan"))},
-        {"metric": "holdout_auc", "value": run.holdout.get("auc", float("nan"))},
-        {"metric": "holdout_n", "value": run.holdout.get("n", 0)},
     ]
+
     if run.models is not None:
         for model_name, m in run.models.models.items():
             for split, metrics in (
@@ -599,6 +558,7 @@ def write_all_reports(run: PipelineRun, cfg: PipelineConfig | None = None) -> Li
                             "value": float(v) if isinstance(v, (int, float)) else v,
                         }
                     )
+
     summary = pd.DataFrame(summary_rows)
     summary_path = tdir / "summary_metrics.csv"
     summary.to_csv(summary_path, index=False)
