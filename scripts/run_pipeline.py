@@ -61,18 +61,20 @@ def main() -> int:
             f"{run.metadata['lsi_quantiles']['q90']:.1f}/"
             f"{run.metadata['lsi_quantiles']['q99']:.1f}"
         )
-        print(f"[run] hold-out MAE={run.holdout.get('mae'):.2f} AUC={run.holdout.get('auc')}"
-              f" n={run.holdout.get('n')}")
+
         if run.models is not None:
             for name, mr in run.models.models.items():
                 tm = mr.test_metrics
                 def _fmt(v: object, spec: str = ".3f") -> str:
                     return format(v, spec) if isinstance(v, (int, float)) else "n/a"
+
+                # Выводим новые Unsupervised метрики (NLL) вместо MAE/R2/AUC
                 print(
-                    f"[run] {name:<8s} test MAE={_fmt(tm.get('mae'), '.2f')} "
-                    f"R²={_fmt(tm.get('r2'))} ROC-AUC={_fmt(tm.get('roc_auc_p90'))} "
+                    f"[run] {name:<8s} test Mean NLL={_fmt(tm.get('mean_nll'))} "
+                    f"Max NLL={_fmt(tm.get('max_nll'))} "
                     f"n={tm.get('n')}"
                 )
+
             lgb = run.models.models.get("nsvm")
             if lgb is not None and lgb.feature_importance is not None:
                 top = lgb.feature_importance.head(8)
