@@ -103,30 +103,26 @@ class NSVMAnomalyDetector(BaseEstimator):
         target_tensor = torch.tensor(X, dtype=torch.float32).to(self.device)
 
         with torch.no_grad():
-            mu, log_var = self.model(X_tensor)
-            log_var = torch.clamp(log_var, min=-4.0, max=4.0)
-            var = torch.exp(log_var)
+            mu, _ = self.model(X_tensor)
+            # ИСПРАВЛЕНО: Вместо NLL возвращаем MAE (абсолютную ошибку).
+            # Она строго > 0 и не взрывается от квадратов и деления на дисперсию.
+            mae = torch.mean(torch.abs(target_tensor - mu), dim=1)
 
-            nll = 0.5 * torch.mean(log_var + ((target_tensor - mu) ** 2) / var, dim=1)
-
-        return nll.cpu().numpy()
+        return mae.cpu().numpy()
 
     def get_nll_components(self, X):
-        """Возвращает аналитический NLL для каждой фичи (используется для атрибуции вместо SHAP)."""
+        """Возвращает аналитический MAE для каждой фичи (используется для атрибуции)."""
         if isinstance(X, pd.DataFrame): X = X.values
         self.model.eval()
         X_tensor = self._create_sequences(X).to(self.device)
         target_tensor = torch.tensor(X, dtype=torch.float32).to(self.device)
 
         with torch.no_grad():
-            mu, log_var = self.model(X_tensor)
-            log_var = torch.clamp(log_var, min=-4.0, max=4.0)
-            var = torch.exp(log_var)
+            mu, _ = self.model(X_tensor)
+            # ИСПРАВЛЕНО: Возвращаем матрицу абсолютных ошибок для SHAP-атрибуции
+            mae_components = torch.abs(target_tensor - mu)
 
-            # Не усредняем по фичам, отдаем матрицу [samples, features]
-            nll_components = 0.5 * (log_var + ((target_tensor - mu) ** 2) / var)
-
-        return nll_components.cpu().numpy()
+        return mae_components.cpu().numpy()
 
     def partial_fit(self, X, epochs=10, lr=1e-4):
         if self.model is None:

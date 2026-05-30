@@ -145,8 +145,6 @@ def run_pipeline(cfg: PipelineConfig | None = None) -> PipelineRun:
         cv_n_splits=cfg.cv_n_splits,
     )
 
-    adaptive_model_update(models, features)
-
     from .aggregate import _feature_to_module
     from .gbm_lsi import gbm_lsi as _gbm_lsi
 
@@ -154,6 +152,19 @@ def run_pipeline(cfg: PipelineConfig | None = None) -> PipelineRun:
     X_full_f = features[nsvm_container.feature_cols].fillna(0.0)
     f2m = {c: _feature_to_module(c) for c in X_full_f.columns}
 
+    # 1. СНАЧАЛА получаем честный исторический бэктест (базовой моделью)
+    _, hist_attr, _ = _gbm_lsi(
+        model=nsvm_container.model,
+        X_full=X_full_f,
+        train_idx=nsvm_container.train_idx,
+        feature_to_module=f2m
+    )
+
+    # 2. ТЕПЕРЬ запускаем адаптацию на последних 30 днях (для прода)
+    # Убедись, что внутри этой функции исправлен расчет порога (threshold) и lr=1e-5!
+    adaptive_model_update(models, features)
+
+    # 3. Если веса обновились, получаем предсказания адаптированной модели
     _, new_attr, _ = _gbm_lsi(
         model=nsvm_container.model,
         X_full=X_full_f,
@@ -161,10 +172,16 @@ def run_pipeline(cfg: PipelineConfig | None = None) -> PipelineRun:
         feature_to_module=f2m
     )
 
-    if 'M1' in new_attr.columns and 'contrib_M1' not in new_attr.columns:
-        new_attr = new_attr.rename(columns={m: f"contrib_{m}" for m in ["M1", "M2", "M3", "M4", "M5"]})
+    # 4. "Сшиваем" результаты: берем честную историю и заменяем только последние 30 дней
+    # на результаты адаптированной модели
+    final_attr = hist_attr.copy()
+    tail_len = 30
+    final_attr.iloc[-tail_len:] = new_attr.iloc[-tail_len:]
 
-    nsvm_container.module_attribution = new_attr
+    if 'M1' in final_attr.columns and 'contrib_M1' not in final_attr.columns:
+        final_attr = final_attr.rename(columns={m: f"contrib_{m}" for m in ["M1", "M2", "M3", "M4", "M5"]})
+
+    nsvm_container.module_attribution = final_attr
     nsvm_attr = nsvm_container.module_attribution
     lsi = build_lsi_frame(features, nsvm_attr)
 
@@ -226,21 +243,33 @@ def adaptive_model_update(models, new_features):
     actual_model = res.model
     train_features = res.feature_cols
 
+    # Берем последние 30 дней датасета для проверки на смена режима
     X_adaptation = new_features[train_features].tail(30).fillna(0.0)
 
     current_nll_scores = actual_model.predict(X_adaptation)
     current_mean_nll = np.mean(current_nll_scores)
 
-    cv_nll = res.train_metrics.get("mean_nll", 1.0)
-    threshold = cv_nll * 1.5
+    cv_nll = res.train_metrics.get("mean_nll", -1.0)
+
+    # -------------------------------------------------------------
+    # ИСПРАВЛЕНИЕ 1: Корректный расчет порога для отрицательных лоссов.
+    # Прибавляем 50% от модуля значения.
+    # Если cv_nll = -2.0, порог станет -1.0 (то есть "хуже/выше")
+    # -------------------------------------------------------------
+    threshold = cv_nll + abs(cv_nll) * 0.5
 
     if current_mean_nll > threshold:
         print(f"⚠️ ВНИМАНИЕ: Смена рыночного режима! Текущий NLL: {current_mean_nll:.2f} (Порог: {threshold:.2f})")
         print("⏳ Запуск unsupervised дообучения (partial_fit)...")
         try:
-            actual_model.partial_fit(X_adaptation, epochs=7, lr=1e-4)
+            # -------------------------------------------------------------
+            # ИСПРАВЛЕНИЕ 2: Микро-дозирование обучения (Micro-dosing).
+            # Снижаем агрессию дообучения, чтобы не стереть историческую память.
+            # 2 эпохи вместо 7, learning_rate = 1e-5 вместо 1e-4.
+            # -------------------------------------------------------------
+            actual_model.partial_fit(X_adaptation, epochs=2, lr=1e-5)
             print("✅ Веса NSVM обновлены.")
         except Exception as e:
             print(f"❌ Ошибка partial_fit: {e}")
     else:
-        print(f"✅ Рынок в рамках распределения. Текущий NLL: {current_mean_nll:.2f}.")
+        print(f"✅ Рынок в рамках распределения. Текущий NLL: {current_mean_nll:.2f} (Порог: {threshold:.2f}).")
