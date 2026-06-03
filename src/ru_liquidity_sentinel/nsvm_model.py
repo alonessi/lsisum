@@ -170,8 +170,6 @@ class NSVMAnomalyDetector(BaseEstimator):
         X_tensor = self._create_sequences(X_arr, context=context)
         target_tensor = torch.tensor(X_arr, dtype=torch.float32)
 
-        # Initial training has synthetic zero context. Online updates pass real
-        # previous days, so all rows in X are valid targets and must be kept.
         if context is None and len(X_tensor) > self.seq_len:
             X_tensor = X_tensor[self.seq_len :]
             target_tensor = target_tensor[self.seq_len :]

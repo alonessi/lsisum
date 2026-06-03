@@ -20,12 +20,13 @@ from .aggregate import (
     build_lsi_frame,
     detect_stress_episodes,
     noise_breakdown,
+    sensitivity_analysis,
 )
 from .backtest import evaluate_episodes
 from .config import PipelineConfig
-from .gbm_lsi import ECDFCalibration, shap_module_attribution
+from .nsvm_lsi import ECDFCalibration, shap_module_attribution
 from .nsvm_model import NSVMAnomalyDetector
-from .pipeline import build_features, seed_everything
+from .features import build_features, seed_everything
 
 
 HISTORICAL_LSI_NAME = "historical_lsi.parquet"
@@ -97,10 +98,27 @@ def _write_dashboard_artifacts(
     )
     backtest_df = evaluate_episodes(historical_lsi["lsi"], cfg.backtest_episodes)
     nb = noise_breakdown(historical_lsi)
+    feature_cols = list(metadata.get("feature_cols") or [])
+    sens_df = pd.DataFrame(index=historical_lsi.index)
+    sens_summary = pd.DataFrame()
+    if feature_cols:
+        try:
+            sens_df, sens_summary = sensitivity_analysis(
+                features=features,
+                base_lsi=historical_lsi["lsi"],
+                feature_cols=feature_cols,
+                pct=cfg.sensitivity_pct,
+                test_split_date=cfg.nsvm_init_cutoff_date,
+                random_state=cfg.random_state,
+            )
+        except Exception as exc:
+            sens_summary = pd.DataFrame([{"status": "failed", "error": str(exc)}])
 
     auto_episodes.to_csv(root / "auto_episodes.csv", index=False)
     backtest_df.to_csv(root / "backtest_episodes.csv", index=False)
     nb.to_csv(root / "noise_breakdown.csv", index=False)
+    sens_df.to_parquet(root / "sensitivity.parquet")
+    sens_summary.to_csv(root / "sensitivity_summary.csv", index=False)
     metadata_path = root / "metadata.json"
     metadata_path.write_text(json.dumps(metadata, default=str, ensure_ascii=False, indent=2), encoding="utf-8")
 

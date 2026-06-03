@@ -81,7 +81,6 @@ def rolling_mad_zscore(
     elif direction != "two-sided":
         raise ValueError(f"Unknown direction: {direction}")
 
-    # ---> СУПЕР-ФИКС: Ограничение градиентных взрывов <---
     zscore = zscore.clip(lower=-15.0, upper=15.0)
 
     return zscore.fillna(0.0)
@@ -101,7 +100,6 @@ def zscore_to_subindex(zscore: pd.Series, scale: float = 1.0) -> pd.Series:
 
     zscore = zscore.astype(float)
     sub = 100.0 / (1.0 + np.exp(-zscore / scale))
-    # Re-centre one-sided scores so 0 -> 0, +inf -> 100.
     if (zscore.fillna(0) >= 0).all():
         sub = (sub - 50.0) * 2.0
         sub = sub.clip(lower=0.0, upper=100.0)
@@ -166,7 +164,6 @@ def rolling_percentile_rank(
         valid = window[~np.isnan(window)]
         if valid.size == 0:
             return np.nan
-        # Percent of past values strictly less than today's.
         return float((valid < last).sum()) / float(valid.size) * 100.0
 
     rank = s.rolling(win, min_periods=min_periods).apply(_rank, raw=True)
@@ -195,10 +192,6 @@ def winsorize_rolling(
 
     s = series.astype(float).sort_index()
     win = f"{window_days}D"
-    # Cap is computed on past values *only* (shifted by one calendar day)
-    # so that an incoming outlier is compared against history that does
-    # not yet contain it.  Otherwise a single huge value dominates its
-    # own quantile and is left unclipped.
     past = s.shift(1, freq="D")
     cap = past.rolling(win, min_periods=min_periods).quantile(upper_q)
     cap = cap.reindex(s.index, method="ffill")
@@ -237,7 +230,7 @@ class RobustOnlineCUSUM:
     Provided by the user.  Strictly causal: at each step ``t`` the
     rolling median / MAD are computed on history ``[t - window_size, t)``
     (i.e. *before* observing ``current_value``).  The output is in
-    ``[0, 1]`` so it can be fed into a DSM / GBM model as a
+    ``[0, 1]`` so it can be fed into the NSVM aggregator as a
     stationary feature without re-scaling.
 
     Parameters
@@ -274,7 +267,6 @@ class RobustOnlineCUSUM:
         self.history: "deque[float]" = deque(maxlen=window_size)
 
     def update(self, current_value: float) -> float:
-        # Burn-in: collect history and emit zero stress.
         if len(self.history) < 21:
             self.history.append(current_value)
             return 0.0
@@ -286,16 +278,11 @@ class RobustOnlineCUSUM:
             rolling_mad = 1e-6
 
         z_robust = (current_value - rolling_median) / (rolling_mad * MAD_TO_STD)
-        # Append current value AFTER computing z-score (no leakage).
         self.history.append(current_value)
 
-        # Cooldown: when the signal goes below the median, dampen the
-        # accumulated stress instead of letting it linger.
         if z_robust < 0:
             self.cusum *= self.cooldown_factor
 
-        # Classic CUSUM step: accumulate only positive deviations
-        # exceeding the drift threshold.
         self.cusum = max(0.0, self.cusum + z_robust - self.drift)
 
         return float(min(1.0, self.cusum / self.threshold))

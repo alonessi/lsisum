@@ -1,19 +1,19 @@
-"""Allow ``python -m ru_liquidity_sentinel`` to run the pipeline."""
-
 from __future__ import annotations
 
-import sys
-from pathlib import Path
+from .config import PipelineConfig
+from .incremental import incremental_update, offline_initialize
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
-SCRIPT = REPO_ROOT / "scripts" / "run_pipeline.py"
+
+def main() -> int:
+    """Run the production incremental NSVM workflow."""
+
+    cfg = PipelineConfig()
+    cfg.ensure_dirs()
+    result = incremental_update(cfg, fetch=False)
+    if result.new_rows == 0 and result.last_saved_date is None:
+        offline_initialize(cfg)
+    return 0
+
 
 if __name__ == "__main__":
-    sys.argv[0] = str(SCRIPT)
-    exec(SCRIPT.read_text(), {"__name__": "__main__", "__file__": str(SCRIPT)})
-
-
-def main() -> int:  # pragma: no cover - CLI shim
-    sys.argv[0] = str(SCRIPT)
-    exec(SCRIPT.read_text(), {"__name__": "__main__", "__file__": str(SCRIPT)})
-    return 0
+    raise SystemExit(main())

@@ -11,17 +11,6 @@ from ..normalize import (
     robust_online_cusum_series,
 )
 
-
-# Mapping from actual bliquidity CSV column names to the internal m5_
-# feature names the rest of the pipeline expects.
-#
-# The bliquidity CSV ships:
-#   deficit_total_blnrub, bank_corraccounts_blnrub,
-#   delta_1d_blnrub, delta_5d_blnrub, delta_22d_blnrub,
-#   flag_budget_drain, flag_budget_drain_strong
-#
-# Previous code referenced "eks_*" column names that never existed
-# in the actual data, which silently produced all-zero features.
 _BL_COLUMN_MAP = [
     ("bank_corraccounts_blnrub",    "m5_eks_balance_blnrub"),
     ("delta_1d_blnrub",             "m5_eks_delta_1d"),
@@ -57,14 +46,10 @@ def build_m5(
         ["m5_flag_budget_drain", "m5_flag_budget_drain_strong"]
     ].fillna(0).astype("int8")
 
-    # MAD based on the treasury 5-day delta drain (lower values = larger drain)
     out["m5_mad_treasury_drain"] = rolling_mad_zscore(
         out["m5_eks_delta_5d"], window_days=mad_window_days, direction="lower"
     )
 
-    # Roskazna: the actual CSV only provides n_documents (count of
-    # daily operational orders).  Use it as a proxy for treasury
-    # activity; a rolling 5-day diff captures momentum.
     rk = roskazna_index.copy().set_index("date").sort_index()
     rk_col = (
         rk["volume_placed_blnrub"]
@@ -85,8 +70,6 @@ def build_m5(
         out["m5_flag_budget_drain"] | roskazna_drain_flag
     ).astype("int8")
 
-    # MIO CUSUM on treasury drain momentum. Negative delta_5d is drain, while
-    # RobustOnlineCUSUM accumulates positive deviations, so use -delta_5d.
     out["m5_mio_cusum"] = robust_online_cusum_series(
         (-out["m5_eks_delta_5d"]).rename("m5"),
         window_size=min(756, mad_window_days),

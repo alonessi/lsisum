@@ -97,9 +97,6 @@ def build_m1(
     out["m1_required_avg_blnrub"] = daily["required_avg_blnrub"]
     out["m1_ruonia_spread_pct"] = ruonia_aligned - keyrate_aligned
 
-    # EDA-driven winsorisation of the reserve spread (skew=3.1, ex.kurt=15.7,
-    # p99/p50≈3.6).  Causal rolling 1-year p99.5 cap so a one-off transition
-    # month does not bias the 3-year MAD denominator.
     out["m1_reserve_shortfall_blnrub"] = -out["m1_spread_blnrub"]
     out["m1_shortfall_winsorised"] = winsorize_rolling(
         out["m1_reserve_shortfall_blnrub"], window_days=365, upper_q=0.995
@@ -114,7 +111,6 @@ def build_m1(
         rreserves, calendar, days=end_of_period_days
     ).astype("int8")
 
-    # MIO — RobustOnlineCUSUM on the (winsorised) reserve spread.
     out["m1_mio_cusum"] = robust_online_cusum_series(
         out["m1_shortfall_winsorised"].rename("m1"),
         window_size=min(756, mad_window_days),

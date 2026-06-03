@@ -62,7 +62,6 @@ def build_m4(
     out = pd.DataFrame(index=calendar)
     out.index.name = "date"
 
-    # Pass through the canonical TZ flags.
     rename_map = {
         "flag_tax_peak_15": "m4_flag_tax_peak_15",
         "flag_tax_peak_20": "m4_flag_tax_peak_20",
@@ -81,7 +80,6 @@ def build_m4(
         else:
             out[dst] = pd.Series(0, index=calendar, dtype="int8")
 
-    # Aggregate "tax week" flag — peak day ±2 days.
     base_peak = (
         out[
             [
@@ -96,9 +94,6 @@ def build_m4(
     rolling_peak = base_peak.rolling(window=5, center=True, min_periods=1).max()
     out["m4_flag_tax_week"] = rolling_peak.fillna(0).astype("int8")
 
-    # Events count from the daily file.  This is the new "intensity"
-    # signal that the refreshed dataset makes possible (full coverage
-    # 2014–2026 instead of 2021+).
     events_count = align_to_calendar(
         df.get("events_count", pd.Series(dtype=float)),
         calendar,
@@ -111,8 +106,6 @@ def build_m4(
         events_count, window_days=mad_window_days, direction="upper"
     )
 
-    # Multiplicative seasonal factor.  Kept as a *derived feature* so
-    # the GBM / DSM aggregator can decide whether to use it.
     intensity = (
         out[
             [
@@ -141,7 +134,6 @@ def build_m4(
         1.0 + (factor_max - 1.0) * out["m4_tax_pressure"]
     ).clip(lower=1.0, upper=factor_max)
 
-    # MIO — RobustOnlineCUSUM on the events-count series.
     out["m4_mio_cusum"] = robust_online_cusum_series(
         events_count.rename("m4"),
         window_size=min(756, mad_window_days),

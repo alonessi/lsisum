@@ -11,7 +11,7 @@ if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
 from ru_liquidity_sentinel.nsvm_model import NSVMAnomalyDetector
-from ru_liquidity_sentinel.gbm_lsi import ECDFCalibration
+from ru_liquidity_sentinel.nsvm_lsi import ECDFCalibration
 
 
 def test_context_sequences_use_previous_days_without_zero_padding():
