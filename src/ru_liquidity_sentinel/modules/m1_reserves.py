@@ -15,10 +15,10 @@ columns:
 * ``m1_actual_balances_blnrub``      — actual balances on accounts.
 * ``m1_required_avg_blnrub``         — required averaging amount.
 * ``m1_ruonia_spread_pct``           — RUONIA − key rate.
-* ``m1_mad_spread``                  — robust z-score (upper-tail) of the spread.
+* ``m1_mad_spread``                  — robust z-score of reserve shortfall.
 * ``m1_mad_ruonia_spread``           — robust z-score (upper-tail) of (RUONIA − key rate).
 * ``m1_flag_end_of_period``          — 1 in the last ``end_of_period_days`` calendar days of the averaging period.
-* ``m1_mio_cusum``                   — :class:`RobustOnlineCUSUM` accumulator on ``m1_spread_blnrub``.
+* ``m1_mio_cusum``                   — :class:`RobustOnlineCUSUM` accumulator on reserve shortfall.
 """
 
 from __future__ import annotations
@@ -100,11 +100,12 @@ def build_m1(
     # EDA-driven winsorisation of the reserve spread (skew=3.1, ex.kurt=15.7,
     # p99/p50≈3.6).  Causal rolling 1-year p99.5 cap so a one-off transition
     # month does not bias the 3-year MAD denominator.
-    out["m1_spread_winsorised"] = winsorize_rolling(
-        out["m1_spread_blnrub"], window_days=365, upper_q=0.995
+    out["m1_reserve_shortfall_blnrub"] = -out["m1_spread_blnrub"]
+    out["m1_shortfall_winsorised"] = winsorize_rolling(
+        out["m1_reserve_shortfall_blnrub"], window_days=365, upper_q=0.995
     )
     out["m1_mad_spread"] = rolling_mad_zscore(
-        out["m1_spread_winsorised"], window_days=mad_window_days, direction="upper"
+        out["m1_shortfall_winsorised"], window_days=mad_window_days, direction="upper"
     )
     out["m1_mad_ruonia_spread"] = rolling_mad_zscore(
         out["m1_ruonia_spread_pct"], window_days=mad_window_days, direction="upper"
@@ -115,7 +116,7 @@ def build_m1(
 
     # MIO — RobustOnlineCUSUM on the (winsorised) reserve spread.
     out["m1_mio_cusum"] = robust_online_cusum_series(
-        out["m1_spread_winsorised"].rename("m1"),
+        out["m1_shortfall_winsorised"].rename("m1"),
         window_size=min(756, mad_window_days),
     ).values
     return out

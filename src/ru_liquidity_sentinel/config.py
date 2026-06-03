@@ -89,6 +89,15 @@ class PipelineConfig:
     early_stopping_rounds: int = 50
     n_estimators_max: int = 1500
 
+    # Incremental NSVM lifecycle. In production the offline initializer should
+    # learn the latest known-normal regime too; otherwise an arbitrary holdout
+    # year can become a false "crisis" after ECDF calibration. Use the CLI
+    # --cutoff flag for research backtests with an earlier split.
+    nsvm_init_cutoff_date: str = "2025-01-01"
+    nsvm_regime_nll_multiplier: float = 3.0
+    nsvm_partial_fit_epochs: int = 2
+    nsvm_partial_fit_lr: float = 1e-5
+
     # Auto-detection of stress episodes (used to evaluate the model on
     # *unknown* crises beyond the three TZ episodes).
     episode_min_days: int = 5

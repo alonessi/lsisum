@@ -58,7 +58,9 @@ def build_m3(
 
     # ФЛАГИ СОСТОЯНИЯ АУКЦИОНА ИЗ ТЗ
     out["m3_flag_undersubscribed"] = (out["m3_cover_ratio"] < 1.2).astype("int8")
-    out["m3_flag_oversubscribed"] = (out["m3_cover_ratio"] > 2.0).astype("int8")
+    # High demand for OFZ is not a stress state by itself. Keep the column for
+    # dashboards/backward compatibility, but do not let it act as a stress flag.
+    out["m3_flag_oversubscribed"] = pd.Series(0, index=calendar, dtype="int8")
 
     # MIO — CUSUM accumulator on RAW (-cover_ratio).
     cover_for_cusum = (-out["m3_cover_ratio"].fillna(0.0)).rename("m3")

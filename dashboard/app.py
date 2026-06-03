@@ -11,9 +11,8 @@ SRC = REPO_ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
-from src.ru_liquidity_sentinel.config import LSI_THRESHOLDS, PipelineConfig
-from src.ru_liquidity_sentinel.pipeline import run_pipeline
-from src.ru_liquidity_sentinel.reporting import write_all_reports
+from ru_liquidity_sentinel.config import LSI_THRESHOLDS, PipelineConfig
+from ru_liquidity_sentinel.incremental import incremental_update, offline_initialize
 
 # --- КОНФИГУРАЦИЯ СТРАНИЦЫ ---
 st.set_page_config(
@@ -80,10 +79,20 @@ st.markdown("""
 
 @st.cache_data(show_spinner=False)
 def load_artifacts(artifacts_dir: Path) -> dict:
+    def is_fresh(path: Path, ref: Path) -> bool:
+        return path.exists() and path.stat().st_mtime >= ref.stat().st_mtime
+
     feat = pd.read_parquet(artifacts_dir / "features_daily.parquet")
-    lsi = pd.read_parquet(artifacts_dir / "lsi_daily.parquet")
-    target = pd.read_parquet(artifacts_dir / "proxy_target.parquet")["proxy_stress"]
-    sens = pd.read_parquet(artifacts_dir / "sensitivity.parquet")
+    lsi_path = artifacts_dir / "historical_lsi.parquet"
+    if not lsi_path.exists():
+        lsi_path = artifacts_dir / "lsi_daily.parquet"
+    lsi = pd.read_parquet(lsi_path)
+    lsi.index = pd.to_datetime(lsi.index)
+    feat.index = pd.to_datetime(feat.index)
+    p_target = artifacts_dir / "proxy_target.parquet"
+    target = pd.read_parquet(p_target)["proxy_stress"] if p_target.exists() else pd.Series(dtype=float)
+    p_sens = artifacts_dir / "sensitivity.parquet"
+    sens = pd.read_parquet(p_sens) if is_fresh(p_sens, lsi_path) else pd.DataFrame(index=lsi.index)
     _p_sens_sum = artifacts_dir / "sensitivity_summary.csv"
     if _p_sens_sum.exists() and _p_sens_sum.stat().st_size > 0:
         try:
@@ -105,25 +114,29 @@ def load_artifacts(artifacts_dir: Path) -> dict:
 
     model_predictions = pd.DataFrame()
     p_pred = artifacts_dir / "model_predictions.parquet"
-    if p_pred.exists() and p_pred.stat().st_size > 0:
+    if is_fresh(p_pred, lsi_path) and p_pred.stat().st_size > 0:
         try:
             model_predictions = pd.read_parquet(p_pred)
+            model_predictions.index = pd.to_datetime(model_predictions.index)
         except Exception:
             model_predictions = pd.DataFrame()
+    if model_predictions.empty and "lsi" in lsi.columns:
+        model_predictions = lsi[["lsi"]].rename(columns={"lsi": "nsvm"})
 
     model_metrics = pd.read_csv(artifacts_dir / "model_metrics.csv") if (
             artifacts_dir / "model_metrics.csv").exists() else pd.DataFrame()
-    cv_results = pd.read_csv(artifacts_dir / "model_cv_results.csv") if (
-            artifacts_dir / "model_cv_results.csv").exists() else pd.DataFrame()
-    best_params = pd.read_csv(artifacts_dir / "model_best_params.csv") if (
-            artifacts_dir / "model_best_params.csv").exists() else pd.DataFrame()
+    p_cv = artifacts_dir / "model_cv_results.csv"
+    cv_results = pd.read_csv(p_cv) if is_fresh(p_cv, lsi_path) else pd.DataFrame()
+    p_best = artifacts_dir / "model_best_params.csv"
+    best_params = pd.read_csv(p_best) if is_fresh(p_best, lsi_path) else pd.DataFrame()
     noise = pd.read_csv(artifacts_dir / "noise_breakdown.csv") if (
             artifacts_dir / "noise_breakdown.csv").exists() else pd.DataFrame()
 
     model_attributions: Dict[str, pd.DataFrame] = {}
     p_attr = artifacts_dir / "model_nsvm_module_attribution.parquet"
-    if p_attr.exists():
+    if is_fresh(p_attr, lsi_path):
         model_attributions["nsvm"] = pd.read_parquet(p_attr)
+        model_attributions["nsvm"].index = pd.to_datetime(model_attributions["nsvm"].index)
 
     return {
         "features": feat, "lsi": lsi, "target": target, "sensitivity": sens,
@@ -147,6 +160,18 @@ def render_status(value: float):
         st.markdown(f'<span class="status-red">🔴 RED</span>', unsafe_allow_html=True)
 
 
+def source_mtime() -> float:
+    paths = [
+        SRC / "ru_liquidity_sentinel" / "aggregate.py",
+        SRC / "ru_liquidity_sentinel" / "gbm_lsi.py",
+        SRC / "ru_liquidity_sentinel" / "incremental.py",
+        SRC / "ru_liquidity_sentinel" / "nsvm_model.py",
+        *list((SRC / "ru_liquidity_sentinel" / "modules").glob("*.py")),
+    ]
+    mtimes = [p.stat().st_mtime for p in paths if p.exists()]
+    return max(mtimes) if mtimes else 0.0
+
+
 def main() -> None:
     cfg = PipelineConfig()
     cfg.ensure_dirs()
@@ -156,15 +181,29 @@ def main() -> None:
     st.sidebar.markdown("**ПСБ Казначейство**")
 
     if st.sidebar.button("⏵ ОБНОВИТЬ ДАННЫЕ"):
-        with st.spinner("Пересчет пайплайна..."):
-            run = run_pipeline(cfg)
-            write_all_reports(run, cfg)
+        with st.spinner("Инкрементальное обновление NSVM..."):
+            result = incremental_update(cfg, fetch=True)
             st.cache_data.clear()
-        st.sidebar.success("Готово.")
+        if result.new_rows:
+            msg = f"Добавлено дней: {result.new_rows}."
+            if result.partial_fit_ran:
+                msg += " Обнаружена смена режима, NSVM дообучен."
+            st.sidebar.success(msg)
+        else:
+            st.sidebar.info("Новых дней нет.")
 
-    if not (artifacts_dir / "lsi_daily.parquet").exists():
-        st.warning("Артефакты не найдены. Запустите пайплайн.")
-        return
+    if not (artifacts_dir / "historical_lsi.parquet").exists():
+        if st.sidebar.button("ПЕРВИЧНАЯ ИНИЦИАЛИЗАЦИЯ"):
+            with st.spinner(f"Обучение NSVM до {cfg.nsvm_init_cutoff_date} и сборка истории LSI..."):
+                offline_initialize(cfg)
+                st.cache_data.clear()
+            st.sidebar.success("Инициализация готова.")
+        else:
+            st.warning("Артефакты incremental-контура не найдены. Запустите первичную инициализацию.")
+            return
+
+    if (artifacts_dir / "historical_lsi.parquet").stat().st_mtime < source_mtime():
+        st.sidebar.warning("РђСЂС‚РµС„Р°РєС‚С‹ СЃС‚Р°СЂС€Рµ РєРѕРґР° РјРѕРґРµР»Рё. РџРµСЂРµСЃРѕР±РµСЂРёС‚Рµ РёС… С‡РµСЂРµР· РїРµСЂРІРёС‡РЅСѓСЋ РёРЅРёС†РёР°Р»РёР·Р°С†РёСЋ.")
 
     art = load_artifacts(artifacts_dir)
     lsi = art["lsi"]

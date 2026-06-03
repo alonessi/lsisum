@@ -1,0 +1,39 @@
+{
+  "n_days": 5267,
+  "date_min": "2012-01-02",
+  "date_max": "2026-06-03",
+  "lsi_method": "nsvm_ecdf_incremental",
+  "nsvm_init_cutoff_date": "2025-01-01",
+  "feature_cols": [
+    "m1_mad_spread",
+    "m1_mad_ruonia_spread",
+    "m1_flag_end_of_period",
+    "m1_mio_cusum",
+    "m2_mad_cover",
+    "m2_mad_rate_spread",
+    "m2_flag_high_demand",
+    "m2_flag_fine_tuning",
+    "m2_mio_cusum",
+    "m3_mad_cover_low",
+    "m3_mad_yield_spread",
+    "m3_flag_undersubscribed",
+    "m3_flag_oversubscribed",
+    "m3_mio_cusum",
+    "m5_mad_treasury_drain",
+    "m5_mad_roskazna_drain",
+    "m5_flag_budget_drain",
+    "m5_flag_budget_drain_strong",
+    "m5_mio_cusum",
+    "m4_seasonal_factor"
+  ],
+  "train_mean_nll": 0.10099132789339163,
+  "train_std_nll": 0.07599361034514036,
+  "train_max_nll": 0.6382913393904971,
+  "train_n": 4734,
+  "regime_threshold": 0.3289721589288127,
+  "lsi_quantiles": {
+    "q50": 43.826198185165524,
+    "q90": 76.7597035513158,
+    "q99": 93.10368968791808
+  }
+}

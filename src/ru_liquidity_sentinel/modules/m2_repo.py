@@ -25,12 +25,13 @@ def build_m2(
 
     # Рассчитываем взвешенную ставку до группировки по корректной колонке
     df["weighted_rate"] = df["weighted_avg_rate_pct"] * df["allotment_mlnrub"]
+    df["repo_auction_volume_mlnrub"] = df["bliq_repo_auction_vol"] * 1000.0
 
     # Aggregate demand (используем bliq_repo_auction_vol), allotment, and rate
     daily_repo = (
         df.groupby(["date", "term_days"], as_index=False)
         .agg(
-            demand_volume_mlnrub=("bliq_repo_auction_vol", "sum"),
+            demand_volume_mlnrub=("repo_auction_volume_mlnrub", "sum"),
             allotment_mlnrub=("allotment_mlnrub", "sum"),
             weighted_rate_sum=("weighted_rate", "sum"),
             simple_rate_mean=("weighted_avg_rate_pct", "mean"),

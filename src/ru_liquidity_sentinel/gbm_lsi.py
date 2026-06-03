@@ -17,16 +17,20 @@ except ImportError:
 
 @dataclass
 class ECDFCalibration:
-    """Эмпирический CDF калибратор (ранговый). Неуязвим к тяжелым хвостам NLL."""
+    """Empirical CDF calibrator that maps raw anomaly scores to percentile rank."""
+
     train_scores: np.ndarray
 
     @classmethod
-    def fit(cls, train_raw: np.ndarray, **kwargs) -> "ECDFCalibration":
+    def fit(
+        cls,
+        train_raw: np.ndarray,
+        **kwargs,
+    ) -> "ECDFCalibration":
         arr = np.asarray(train_raw, dtype=float)
         arr = arr[np.isfinite(arr)]
         if arr.size == 0:
             arr = np.array([0.0])
-        # Сохраняем отсортированный массив для быстрого поиска перцентилей
         return cls(train_scores=np.sort(arr))
 
     def transform(self, raw: np.ndarray) -> np.ndarray:
@@ -34,15 +38,10 @@ class ECDFCalibration:
         if self.train_scores.size == 0:
             return np.zeros_like(arr)
 
-        # Векторизованный бинарный поиск для вычисления ранга (перцентиля)
         rank_lo = np.searchsorted(self.train_scores, arr, side="left")
         rank_hi = np.searchsorted(self.train_scores, arr, side="right")
-
-        # Усредняем ранги для одинаковых значений
-        ranks = (rank_lo + rank_hi) / 2.0 / self.train_scores.size
-
-        # Масштабируем в интервал [0, 100]
-        return np.clip(ranks * 100.0, 0.0, 100.0)
+        percentile = (rank_lo + rank_hi) / 2.0 / self.train_scores.size
+        return np.clip(percentile * 100.0, 0.0, 100.0)
 
 
 def shap_module_attribution(model: Any, X: pd.DataFrame, feature_to_module: Dict[str, str],
@@ -102,7 +101,7 @@ def shap_module_attribution(model: Any, X: pd.DataFrame, feature_to_module: Dict
 
 
 def gbm_lsi(model: Any, X_full: pd.DataFrame, train_idx: pd.Index, feature_to_module: Dict[str, str],
-            q_low: float = 0.10, q_high: float = 0.99) -> Tuple[pd.Series, pd.DataFrame, LogCalibration]:
+            q_low: float = 0.10, q_high: float = 0.99) -> Tuple[pd.Series, pd.DataFrame, ECDFCalibration]:
     # 1. Получаем сырой NLL по всей истории
     raw_full = pd.Series(model.predict(X_full), index=X_full.index)
 
@@ -121,14 +120,11 @@ def gbm_lsi(model: Any, X_full: pd.DataFrame, train_idx: pd.Index, feature_to_mo
     cal = ECDFCalibration.fit(raw_train)
 
     # Безопасно применяем transform
-    lsi_arr = cal.transform(raw_full.fillna(0.0).values)
+    lsi_arr = cal.transform(raw_full.bfill().ffill().values)
     lsi = pd.Series(lsi_arr, index=X_full.index, name="gbm_lsi")
-
-    # Жестко обнуляем начало LSI, чтобы на графиках не было "призрачного" стресса
-    lsi.iloc[:seq_len] = 0.0
 
     attr = shap_module_attribution(model, X_full, feature_to_module, lsi)
     return lsi, attr, cal
 
 
-__all__ = ["LogCalibration", "gbm_lsi", "shap_module_attribution"]
+__all__ = ["ECDFCalibration", "gbm_lsi", "shap_module_attribution"]

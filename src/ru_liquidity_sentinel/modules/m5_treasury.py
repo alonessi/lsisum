@@ -85,9 +85,10 @@ def build_m5(
         out["m5_flag_budget_drain"] | roskazna_drain_flag
     ).astype("int8")
 
-    # MIO CUSUM on the 5-day delta (tracking the drain momentum)
+    # MIO CUSUM on treasury drain momentum. Negative delta_5d is drain, while
+    # RobustOnlineCUSUM accumulates positive deviations, so use -delta_5d.
     out["m5_mio_cusum"] = robust_online_cusum_series(
-        out["m5_eks_delta_5d"].rename("m5"),
+        (-out["m5_eks_delta_5d"]).rename("m5"),
         window_size=min(756, mad_window_days),
     ).values
 

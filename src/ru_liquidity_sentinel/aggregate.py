@@ -76,8 +76,9 @@ def all_module_scores(features: pd.DataFrame) -> pd.DataFrame:
 
 def apply_m4_penalty(series: pd.Series, features: pd.DataFrame) -> pd.Series:
     """Reduce indicator by 20% (multiply by 0.8) during predictable tax weeks."""
-    if "Tax_Week_Flag" in features.columns:
-        tax_mask = features["Tax_Week_Flag"].reindex(series.index).fillna(0) == 1
+    tax_col = "m4_flag_tax_week" if "m4_flag_tax_week" in features.columns else "Tax_Week_Flag"
+    if tax_col in features.columns:
+        tax_mask = features[tax_col].reindex(series.index).fillna(0) == 1
         return series.where(~tax_mask, series * 0.8)
     return series
 
