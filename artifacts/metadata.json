@@ -3,6 +3,12 @@
   "date_min": "2012-01-02",
   "date_max": "2026-06-03",
   "lsi_method": "nsvm_ecdf_incremental",
+  "lsi_calibration_version": "ecdf_tail_q20_q995_v2",
+  "lsi_calibration": {
+    "method": "ecdf_tail_anchored",
+    "q_low": 0.2,
+    "q_high": 0.995
+  },
   "nsvm_init_cutoff_date": "2025-01-01",
   "feature_cols": [
     "m1_mad_spread",
@@ -26,14 +32,14 @@
     "m5_mio_cusum",
     "m4_seasonal_factor"
   ],
-  "train_mean_nll": 0.10099132789339163,
-  "train_std_nll": 0.07599361034514036,
-  "train_max_nll": 0.6382913393904971,
+  "train_mean_nll": -1.4529473498922898,
+  "train_std_nll": 0.2991151734899997,
+  "train_max_nll": 0.2551706139506189,
   "train_n": 4734,
-  "regime_threshold": 0.3289721589288127,
+  "regime_threshold": -0.5556018294222906,
   "lsi_quantiles": {
-    "q50": 43.826198185165524,
-    "q90": 76.7597035513158,
-    "q99": 93.10368968791808
+    "q50": 34.89416150991475,
+    "q90": 74.77773294420365,
+    "q99": 93.06650796931804
   }
 }

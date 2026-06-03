@@ -1,29 +1,7 @@
-"""Module M1 — Reserve averaging + RUONIA spread.
-
-Per the TZ, this module produces (no smoothing, no sub-index):
-
-* MAD-based robust z-scores of every primary signal
-  (3-year rolling window, ``(x - median) / (1.4826 * MAD)``).
-* Binary flags marking known calendar effects (end of averaging period).
-* The **MIO** feature — :class:`RobustOnlineCUSUM` accumulator on the
-  primary signal (reserve spread).  Strictly causal, in ``[0, 1]``.
-
-We expose the resulting daily DataFrame indexed by ``date`` with the
-columns:
-
-* ``m1_spread_blnrub``               — daily-aligned monthly spread.
-* ``m1_actual_balances_blnrub``      — actual balances on accounts.
-* ``m1_required_avg_blnrub``         — required averaging amount.
-* ``m1_ruonia_spread_pct``           — RUONIA − key rate.
-* ``m1_mad_spread``                  — robust z-score of reserve shortfall.
-* ``m1_mad_ruonia_spread``           — robust z-score (upper-tail) of (RUONIA − key rate).
-* ``m1_flag_end_of_period``          — 1 in the last ``end_of_period_days`` calendar days of the averaging period.
-* ``m1_mio_cusum``                   — :class:`RobustOnlineCUSUM` accumulator on reserve shortfall.
-"""
+"""M1 feature builder: reserve averaging and RUONIA spread."""
 
 from __future__ import annotations
 
-import numpy as np
 import pandas as pd
 
 from ..normalize import (
@@ -37,10 +15,9 @@ from ..normalize import (
 def _expand_periods_to_daily(
     rreserves: pd.DataFrame, calendar: pd.DatetimeIndex
 ) -> pd.DataFrame:
-    """Forward-fill monthly reserve series to a daily calendar."""
+    """Forward-fill reserve-averaging periods to the daily calendar."""
 
     df = rreserves.copy().set_index("date").sort_index()
-
     cols = [
         "actual_balances_blnrub",
         "required_avg_blnrub",
@@ -55,7 +32,7 @@ def _expand_periods_to_daily(
 def _end_of_period_flag(
     rreserves: pd.DataFrame, calendar: pd.DatetimeIndex, days: int = 5
 ) -> pd.Series:
-    """Mark the last ``days`` calendar days of each averaging period."""
+    """Mark the final days of each reserve-averaging period."""
 
     starts = rreserves["date"].sort_values().reset_index(drop=True)
     flags = pd.Series(0, index=calendar, dtype="int8")
@@ -79,7 +56,7 @@ def build_m1(
     mad_window_days: int,
     end_of_period_days: int = 5,
 ) -> pd.DataFrame:
-    """Construct the M1 daily feature frame (mad scores + flags + MIO)."""
+    """Build daily M1 features from reserves, RUONIA and key-rate data."""
 
     daily = _expand_periods_to_daily(rreserves, calendar)
 

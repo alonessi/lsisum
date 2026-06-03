@@ -61,6 +61,8 @@ class PipelineConfig:
     n_estimators_max: int = 1500
 
     nsvm_init_cutoff_date: str = "2025-01-01"
+    nsvm_lsi_q_low: float = 0.20
+    nsvm_lsi_q_high: float = 0.995
     nsvm_regime_nll_multiplier: float = 3.0
     nsvm_partial_fit_epochs: int = 2
     nsvm_partial_fit_lr: float = 1e-5

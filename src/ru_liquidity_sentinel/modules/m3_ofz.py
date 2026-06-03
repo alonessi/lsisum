@@ -1,4 +1,4 @@
-"""Module M3 — OFZ primary auctions (Minfin)."""
+"""M3 feature builder: primary OFZ auctions."""
 
 from __future__ import annotations
 
@@ -8,15 +8,16 @@ import pandas as pd
 from ..normalize import (
     align_to_calendar,
     rolling_mad_zscore,
-    robust_online_cusum_series
+    robust_online_cusum_series,
 )
+
 
 def build_m3(
     ofz_auctions: pd.DataFrame,
     calendar: pd.DatetimeIndex,
     mad_window_days: int,
 ) -> pd.DataFrame:
-    """Construct the M3 daily feature frame (no smoothing)."""
+    """Build daily M3 features from primary auction results."""
 
     df = ofz_auctions.copy()
 
@@ -38,7 +39,7 @@ def build_m3(
 
     out = pd.DataFrame(index=calendar)
     out.index.name = "date"
-    
+
     out["m3_cover_ratio"] = align_to_calendar(
         daily["cover_ratio_clean"], calendar, method="ffill"
     )
@@ -47,7 +48,7 @@ def build_m3(
     )
 
     rolling_med = out["m3_yield_pct"].rolling("60D", min_periods=10).median()
-    out["m3_yield_spread_pct"] = (out["m3_yield_pct"] - rolling_med)
+    out["m3_yield_spread_pct"] = out["m3_yield_pct"] - rolling_med
 
     out["m3_mad_cover_low"] = rolling_mad_zscore(
         out["m3_cover_ratio"], window_days=mad_window_days, direction="lower"

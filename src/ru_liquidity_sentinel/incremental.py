@@ -16,7 +16,7 @@ from . import loaders
 from .aggregate import (
     _feature_to_module,
     aggregator_feature_columns,
-    apply_m4_penalty,
+    apply_tax_week_discount,
     build_lsi_frame,
     detect_stress_episodes,
     noise_breakdown,
@@ -24,7 +24,7 @@ from .aggregate import (
 )
 from .backtest import evaluate_episodes
 from .config import PipelineConfig
-from .nsvm_lsi import ECDFCalibration, shap_module_attribution
+from .nsvm_lsi import ECDFCalibration, estimate_module_attribution
 from .nsvm_model import NSVMAnomalyDetector
 from .features import build_features, seed_everything
 
@@ -36,6 +36,7 @@ INCREMENTAL_META_NAME = "incremental_metadata.json"
 RAW_SCORE_COL = "raw_nsvm_score"
 RAW_SCORE_EMA_COL = "raw_nsvm_score_ema"
 CALIBRATED_SIGNAL_COL = "nsvm_calibrated_signal"
+CALIBRATION_VERSION = "ecdf_tail_q20_q995_v2"
 
 
 @dataclass
@@ -171,6 +172,12 @@ def _metadata(
         "date_min": features.index.min().date().isoformat(),
         "date_max": features.index.max().date().isoformat(),
         "lsi_method": "nsvm_ecdf_incremental",
+        "lsi_calibration_version": CALIBRATION_VERSION,
+        "lsi_calibration": {
+            "method": "ecdf_tail_anchored",
+            "q_low": float(cfg.nsvm_lsi_q_low),
+            "q_high": float(cfg.nsvm_lsi_q_high),
+        },
         "nsvm_init_cutoff_date": cutoff_date,
         "feature_cols": feature_cols,
         "train_mean_nll": float(train_scores.mean()),
@@ -205,7 +212,7 @@ def _build_full_lsi(
         name=CALIBRATED_SIGNAL_COL,
     )
 
-    attr = shap_module_attribution(model, X_full, _feature_to_module_map(feature_cols), calibrated)
+    attr = estimate_module_attribution(model, X_full, _feature_to_module_map(feature_cols), calibrated)
     lsi = build_lsi_frame(features, attr)
     lsi = _add_internal_score_columns(lsi, raw_scores, raw_scores_ema, calibrated)
     return lsi, raw_scores, raw_scores_ema, calibrated
@@ -234,7 +241,11 @@ def offline_initialize(cfg: PipelineConfig | None = None, cutoff_date: str | Non
     if len(raw_train) > seq_len:
         raw_train.iloc[:seq_len] = np.nan
     raw_train_ema = raw_train.ewm(span=7, adjust=False).mean().dropna()
-    calibrator = ECDFCalibration.fit(raw_train_ema.values)
+    calibrator = ECDFCalibration.fit(
+        raw_train_ema.values,
+        q_low=cfg.nsvm_lsi_q_low,
+        q_high=cfg.nsvm_lsi_q_high,
+    )
 
     historical_lsi, _raw, _raw_ema, _cal = _build_full_lsi(cfg, features, model, calibrator, feature_cols)
     metadata = _metadata(cfg, features, historical_lsi, feature_cols, raw_train_ema, cutoff_date)
@@ -334,12 +345,14 @@ def _finalize_new_lsi_rows(
 ) -> pd.DataFrame:
     out = pd.DataFrame(index=features_new.index)
     lsi_raw = attr_new["dsm_anomaly"].reindex(out.index).fillna(0.0)
-    out["lsi"] = apply_m4_penalty(lsi_raw, features_new)
+    out["lsi"] = apply_tax_week_discount(lsi_raw, features_new)
 
     for module in ("M1", "M2", "M3", "M4", "M5"):
         contrib_col = f"contrib_{module}"
         share_col = f"share_{module}"
-        out[contrib_col] = apply_m4_penalty(attr_new[contrib_col].reindex(out.index).fillna(0.0), features_new)
+        out[contrib_col] = apply_tax_week_discount(
+            attr_new[contrib_col].reindex(out.index).fillna(0.0), features_new
+        )
         out[share_col] = attr_new[share_col].reindex(out.index).fillna(0.0)
 
     out["lsi"] = _ema_continue(out["lsi"], float(historical_lsi["lsi"].iloc[-1]), span=5)
@@ -377,6 +390,14 @@ def incremental_update(
     if paths["metadata"].exists():
         existing_metadata = json.loads(paths["metadata"].read_text(encoding="utf-8"))
         if existing_metadata.get("nsvm_init_cutoff_date") != cfg.nsvm_init_cutoff_date:
+            return offline_initialize(cfg)
+        if existing_metadata.get("lsi_calibration_version") != CALIBRATION_VERSION:
+            return offline_initialize(cfg)
+        existing_calibration = existing_metadata.get("lsi_calibration") or {}
+        if (
+            float(existing_calibration.get("q_low", -1.0)) != float(cfg.nsvm_lsi_q_low)
+            or float(existing_calibration.get("q_high", -1.0)) != float(cfg.nsvm_lsi_q_high)
+        ):
             return offline_initialize(cfg)
 
     historical_lsi = pd.read_parquet(paths["historical_lsi"]).sort_index()
@@ -427,7 +448,7 @@ def incremental_update(
         name=CALIBRATED_SIGNAL_COL,
     )
 
-    attr_new = shap_module_attribution(model, X_new, _feature_to_module_map(feature_cols), calibrated_new)
+    attr_new = estimate_module_attribution(model, X_new, _feature_to_module_map(feature_cols), calibrated_new)
     lsi_new = _finalize_new_lsi_rows(cfg, features.loc[new_idx], attr_new, historical_lsi)
     lsi_new = _add_internal_score_columns(lsi_new, raw_new, raw_new_ema, calibrated_new)
 

@@ -74,13 +74,13 @@ def test_m5_mio_reacts_to_drain_not_inflow():
     assert m5["m5_mio_cusum"].iloc[-1] == 0.0
 
 
-def test_m4_penalty_uses_actual_tax_week_feature_name():
-    from ru_liquidity_sentinel.aggregate import apply_m4_penalty
+def test_tax_week_discount_uses_actual_feature_name():
+    from ru_liquidity_sentinel.aggregate import apply_tax_week_discount
 
     idx = pd.date_range("2024-01-01", periods=3, freq="D")
     s = pd.Series([100.0, 100.0, 100.0], index=idx)
     features = pd.DataFrame({"m4_flag_tax_week": [0, 1, 0]}, index=idx)
 
-    out = apply_m4_penalty(s, features)
+    out = apply_tax_week_discount(s, features)
 
     assert out.tolist() == [100.0, 80.0, 100.0]

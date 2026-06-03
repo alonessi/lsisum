@@ -161,7 +161,7 @@ def render_status(value: float) -> None:
         st.markdown('<span class="status-red">RED</span>', unsafe_allow_html=True)
 
 
-def source_mtime() -> float:
+def model_source_mtime() -> float:
     paths = [
         SRC / "ru_liquidity_sentinel" / "aggregate.py",
         SRC / "ru_liquidity_sentinel" / "features.py",
@@ -180,10 +180,10 @@ def main() -> None:
     artifacts_dir = cfg.artifacts_dir
 
     st.sidebar.title("Sentinel Control")
-    st.sidebar.markdown("**ПСБ Казначейство**")
+    st.sidebar.markdown("**Liquidity Stress Index**")
 
     if st.sidebar.button("Обновить данные"):
-        with st.spinner("Инкрементальное обновление NSVM..."):
+        with st.spinner("Выполняется инкрементальное обновление NSVM..."):
             result = incremental_update(cfg, fetch=True)
             st.cache_data.clear()
         if result.new_rows:
@@ -204,7 +204,7 @@ def main() -> None:
             st.warning("Артефакты incremental-контура не найдены. Запустите первичную инициализацию.")
             return
 
-    if (artifacts_dir / "historical_lsi.parquet").stat().st_mtime < source_mtime():
+    if (artifacts_dir / "historical_lsi.parquet").stat().st_mtime < model_source_mtime():
         st.sidebar.warning("Артефакты старше кода модели. Пересоберите их через первичную инициализацию.")
 
     art = load_artifacts(artifacts_dir)
@@ -239,16 +239,26 @@ def main() -> None:
     lsi_w = lsi.loc[start:end]
     feat_w = feat.loc[start:end]
 
-    tabs = st.tabs(["LSI", "Модули", "Модель", "Backtest", "Авто-эпизоды", "Чувствительность", "Алерты"])
+    tabs = st.tabs(
+        [
+            "LSI",
+            "Модули",
+            "Модель",
+            "Backtest",
+            "Авто-эпизоды",
+            "Чувствительность",
+            "Алерты",
+        ]
+    )
 
     with tabs[0]:
-        st.subheader("Линейка индекса (NSVM)")
+        st.subheader("LSI")
         st.line_chart(lsi_w[["lsi"]].rename(columns={"lsi": "LSI Index"}), color="#00D4FF", height=350)
 
         attr_df = art["model_attributions"].get("nsvm", lsi).loc[start:end]
         contrib_cols = [c for c in attr_df.columns if c.startswith("contrib_")]
         if contrib_cols:
-            st.subheader("Структура вклада модулей (SHAP GradientExplainer)")
+            st.subheader("Структура вклада модулей")
             st.area_chart(attr_df[contrib_cols], height=300)
 
     with tabs[1]:
@@ -282,7 +292,7 @@ def main() -> None:
         if not art["sensitivity_summary"].empty:
             st.dataframe(art["sensitivity_summary"], use_container_width=True)
         if sens_w.empty and art["sensitivity_summary"].empty:
-            st.info("Актуальная чувствительность ещё не рассчитана. Запустите первичную инициализацию или обновление.")
+            st.info("Чувствительность ещё не рассчитана. Запустите первичную инициализацию или обновление.")
 
     with tabs[6]:
         st.subheader("Критическое давление (Top-30)")

@@ -52,13 +52,17 @@ def all_module_scores(features: pd.DataFrame) -> pd.DataFrame:
     return pd.concat([module_score(features, m) for m in ("M1", "M2", "M3", "M4", "M5")], axis=1)
 
 
-def apply_m4_penalty(series: pd.Series, features: pd.DataFrame) -> pd.Series:
-    """Reduce indicator by 20% (multiply by 0.8) during predictable tax weeks."""
+def apply_tax_week_discount(series: pd.Series, features: pd.DataFrame) -> pd.Series:
+    """Discount predictable tax-week pressure by 20%."""
+
     tax_col = "m4_flag_tax_week" if "m4_flag_tax_week" in features.columns else "Tax_Week_Flag"
     if tax_col in features.columns:
         tax_mask = features[tax_col].reindex(series.index).fillna(0) == 1
         return series.where(~tax_mask, series * 0.8)
     return series
+
+
+apply_m4_penalty = apply_tax_week_discount
 
 
 def exponential_smoothing(series: pd.Series, span: int) -> pd.Series:
@@ -71,14 +75,14 @@ def build_lsi_frame(features: pd.DataFrame, nsvm_attribution: pd.DataFrame, ema_
     src = nsvm_attribution["dsm_anomaly"] if "dsm_anomaly" in nsvm_attribution.columns else nsvm_attribution.iloc[:, 0]
     lsi_raw = src.reindex(features.index).fillna(0.0)
 
-    out["lsi"] = apply_m4_penalty(lsi_raw, features)
+    out["lsi"] = apply_tax_week_discount(lsi_raw, features)
 
     for module in ("M1", "M2", "M3", "M4", "M5"):
         contrib_col = f"contrib_{module}"
         share_col = f"share_{module}"
         if contrib_col in nsvm_attribution.columns:
             c_raw = nsvm_attribution[contrib_col].reindex(features.index).fillna(0.0)
-            out[contrib_col] = apply_m4_penalty(c_raw, features)
+            out[contrib_col] = apply_tax_week_discount(c_raw, features)
             out[share_col] = nsvm_attribution[share_col].reindex(features.index).fillna(0.0)
         else:
             out[contrib_col] = 0.0
@@ -264,7 +268,7 @@ def fit_model_suite(
             feature_to_module=feature_to_module_nsvm,
         )
 
-        lsi_series = apply_m4_penalty(lsi_series, features)
+        lsi_series = apply_tax_week_discount(lsi_series, features)
         if ema_span is not None and ema_span > 0:
             lsi_series = exponential_smoothing(lsi_series, ema_span)
 
@@ -282,7 +286,6 @@ def fit_model_suite(
             **kwargs,
         )
 
-    print("Training unsupervised NSVM...")
     seq_length = 14
     hidden_dimensions = 64
     num_epochs = 30
@@ -362,7 +365,7 @@ def sensitivity_analysis(
             lsi_arr = cal.transform(raw_full.values)
             lsi_series = pd.Series(lsi_arr, index=df.index, name="nsvm_lsi")
 
-            lsi_series = apply_m4_penalty(lsi_series, features)
+            lsi_series = apply_tax_week_discount(lsi_series, features)
             lsi_series = exponential_smoothing(lsi_series, span=5)
             columns[label] = lsi_series
             aligned = pd.concat(
@@ -461,6 +464,6 @@ def noise_breakdown(lsi_frame: pd.DataFrame) -> pd.DataFrame:
     return df.sort_values("contribution", ascending=False).reset_index(drop=True)
 
 
-__all__ = ["MODULE_SCORE_FORMULA", "module_columns", "module_score", "all_module_scores", "apply_m4_penalty",
+__all__ = ["MODULE_SCORE_FORMULA", "module_columns", "module_score", "all_module_scores", "apply_tax_week_discount", "apply_m4_penalty",
            "exponential_smoothing", "build_lsi_frame", "lsi_status", "aggregator_feature_columns", "fit_model_suite",
            "ModelResult", "MultiModelResult", "sensitivity_analysis", "detect_stress_episodes", "noise_breakdown"]

@@ -1,4 +1,4 @@
-"""Module M5 — Federal treasury & bank-sector liquidity."""
+"""M5 feature builder: treasury flows and bank-sector liquidity."""
 
 from __future__ import annotations
 
@@ -11,13 +11,14 @@ from ..normalize import (
     robust_online_cusum_series,
 )
 
+
 _BL_COLUMN_MAP = [
-    ("bank_corraccounts_blnrub",    "m5_eks_balance_blnrub"),
-    ("delta_1d_blnrub",             "m5_eks_delta_1d"),
-    ("delta_5d_blnrub",             "m5_eks_delta_5d"),
-    ("delta_22d_blnrub",            "m5_eks_delta_22d"),
-    ("flag_budget_drain",           "m5_flag_budget_drain"),
-    ("flag_budget_drain_strong",    "m5_flag_budget_drain_strong"),
+    ("bank_corraccounts_blnrub", "m5_eks_balance_blnrub"),
+    ("delta_1d_blnrub", "m5_eks_delta_1d"),
+    ("delta_5d_blnrub", "m5_eks_delta_5d"),
+    ("delta_22d_blnrub", "m5_eks_delta_22d"),
+    ("flag_budget_drain", "m5_flag_budget_drain"),
+    ("flag_budget_drain_strong", "m5_flag_budget_drain_strong"),
 ]
 
 
@@ -27,7 +28,7 @@ def build_m5(
     calendar: pd.DatetimeIndex,
     mad_window_days: int,
 ) -> pd.DataFrame:
-    """Construct the M5 daily feature frame."""
+    """Build daily M5 features from liquidity and treasury-flow data."""
 
     bl = bliquidity.copy().set_index("date").sort_index()
 
@@ -36,9 +37,7 @@ def build_m5(
 
     for src, dst in _BL_COLUMN_MAP:
         if src in bl.columns:
-            out[dst] = align_to_calendar(
-                bl[src], calendar, method="ffill"
-            )
+            out[dst] = align_to_calendar(bl[src], calendar, method="ffill")
         else:
             out[dst] = np.nan
 

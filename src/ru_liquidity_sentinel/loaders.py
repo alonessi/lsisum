@@ -1,10 +1,4 @@
-"""Load the parsed CSV datasets into tidy ``pandas`` DataFrames.
-
-The parsing layer (CBR / Minfin / Roskazna scrapers) is implemented
-elsewhere by the team — we only consume the resulting CSVs.  Each
-loader normalises column names, parses dates and returns a DataFrame
-ready for feature engineering.
-"""
+"""Load parsed CSV datasets into feature-ready ``pandas`` DataFrames."""
 
 from __future__ import annotations
 
@@ -23,6 +17,7 @@ def _read_csv(path: Path) -> pd.DataFrame:
 
 def load_rreserves(data_dir: Path) -> pd.DataFrame:
     """Monthly reserve-averaging series (M1)."""
+
     df = _read_csv(data_dir / RAW_FILES["m1_rreserves"])
     df["period_start"] = pd.to_datetime(df["period_start"], errors="coerce")
     df = df.dropna(subset=["period_start"]).sort_values("period_start")
@@ -32,6 +27,7 @@ def load_rreserves(data_dir: Path) -> pd.DataFrame:
 
 def load_ruonia(data_dir: Path) -> pd.DataFrame:
     """Daily RUONIA rate (M1)."""
+
     df = _read_csv(data_dir / RAW_FILES["m1_ruonia"])
     df["date"] = pd.to_datetime(df["date"], errors="coerce")
     df = df.dropna(subset=["date"]).sort_values("date")
@@ -40,6 +36,7 @@ def load_ruonia(data_dir: Path) -> pd.DataFrame:
 
 def load_keyrate(data_dir: Path) -> pd.DataFrame:
     """Daily key rate (M2 input)."""
+
     df = _read_csv(data_dir / RAW_FILES["m2_keyrate"])
     df["date"] = pd.to_datetime(df["date"], errors="coerce")
     df = df.dropna(subset=["date"]).sort_values("date")
@@ -47,7 +44,8 @@ def load_keyrate(data_dir: Path) -> pd.DataFrame:
 
 
 def load_repo_auctions(data_dir: Path) -> pd.DataFrame:
-    """CBR repo auctions (M2)."""
+    """Bank of Russia repo auctions (M2)."""
+
     df = _read_csv(data_dir / RAW_FILES["m2_repo_auctions"])
     df["date"] = pd.to_datetime(df["date"], errors="coerce")
     df = df.dropna(subset=["date"]).sort_values("date")
@@ -55,7 +53,8 @@ def load_repo_auctions(data_dir: Path) -> pd.DataFrame:
 
 
 def load_ofz_auctions(data_dir: Path) -> pd.DataFrame:
-    """Minfin OFZ auctions (M3)."""
+    """Primary OFZ auctions (M3)."""
+
     df = _read_csv(data_dir / RAW_FILES["m3_ofz_auctions"])
     df["auction_date"] = pd.to_datetime(df["auction_date"], errors="coerce")
     df = df.dropna(subset=["auction_date"]).sort_values("auction_date")
@@ -65,6 +64,7 @@ def load_ofz_auctions(data_dir: Path) -> pd.DataFrame:
 
 def load_tax_calendar(data_dir: Path) -> pd.DataFrame:
     """Tax calendar events (M4)."""
+
     df = _read_csv(data_dir / RAW_FILES["m4_tax_calendar"])
     df["date"] = pd.to_datetime(df["date"], errors="coerce")
     df = df.dropna(subset=["date"]).sort_values("date")
@@ -72,7 +72,8 @@ def load_tax_calendar(data_dir: Path) -> pd.DataFrame:
 
 
 def load_tax_flags_daily(data_dir: Path) -> pd.DataFrame:
-    """Pre-computed daily tax flags (M4)."""
+    """Daily tax flags (M4)."""
+
     df = _read_csv(data_dir / RAW_FILES["m4_tax_flags_daily"])
     df["date"] = pd.to_datetime(df["date"], errors="coerce")
     df = df.dropna(subset=["date"]).sort_values("date")
@@ -80,7 +81,8 @@ def load_tax_flags_daily(data_dir: Path) -> pd.DataFrame:
 
 
 def load_bliquidity(data_dir: Path) -> pd.DataFrame:
-    """CBR bank-sector liquidity (ground truth)."""
+    """Bank-sector liquidity indicators (M5)."""
+
     df = _read_csv(data_dir / RAW_FILES["m5_bliquidity"])
     df["date"] = pd.to_datetime(df["date"], errors="coerce")
     df = df.dropna(subset=["date"]).sort_values("date")
@@ -88,7 +90,8 @@ def load_bliquidity(data_dir: Path) -> pd.DataFrame:
 
 
 def load_roskazna_index(data_dir: Path) -> pd.DataFrame:
-    """Roskazna deposit-allocation document index (M5)."""
+    """Treasury deposit-allocation document index (M5)."""
+
     df = _read_csv(data_dir / RAW_FILES["m5_roskazna_eks_deposits_index"])
     df["date"] = pd.to_datetime(df["date"], errors="coerce")
     df = df.dropna(subset=["date"]).sort_values("date")
@@ -96,7 +99,8 @@ def load_roskazna_index(data_dir: Path) -> pd.DataFrame:
 
 
 def load_sors_funds(data_dir: Path) -> pd.DataFrame:
-    """Bank-sector aggregated funds breakdown (M5 supplementary)."""
+    """Aggregated banking-sector funds breakdown (M5 supplementary)."""
+
     df = _read_csv(data_dir / RAW_FILES["m5_sors_funds_all"])
     df["date"] = pd.to_datetime(df["date"], errors="coerce")
     df = df.dropna(subset=["date"]).sort_values("date")
@@ -105,7 +109,8 @@ def load_sors_funds(data_dir: Path) -> pd.DataFrame:
 
 
 def load_all(data_dir: Path) -> dict[str, pd.DataFrame]:
-    """Load every parsed CSV at once; helpful for smoke tests."""
+    """Load every configured raw dataset."""
+
     return {
         "rreserves": load_rreserves(data_dir),
         "ruonia": load_ruonia(data_dir),

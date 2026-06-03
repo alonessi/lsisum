@@ -45,12 +45,41 @@ def test_save_load_weights_preserves_predictions(tmp_path):
     assert np.allclose(before, after)
 
 
-def test_ecdf_calibration_returns_percentile_rank():
+def test_ecdf_calibration_anchors_calm_and_stress_quantiles():
     train = np.arange(1000, dtype=float)
     cal = ECDFCalibration.fit(train)
 
-    out = cal.transform(np.array([0.0, 250.0, 500.0, 800.0, 995.0, 1200.0]))
+    out = cal.transform(np.array([0.0, 199.0, 500.0, 800.0, 995.0, 1200.0]))
 
     assert np.all(np.diff(out) >= 0.0)
-    assert np.allclose(out[1:5], [25.05, 50.05, 80.05, 99.55])
+    assert out[0] == 0.0
+    assert out[1] == 0.0
+    assert np.allclose(out[2:5], [37.79874214, 75.53459119, 100.0])
     assert out[5] == 100.0
+
+
+def test_predict_uses_gaussian_nll(monkeypatch):
+    model = NSVMAnomalyDetector(seq_len=2)
+    model.model = object()
+
+    target = pd.DataFrame([[2.0, 4.0]], columns=["a", "b"])
+    mu = pd.DataFrame([[1.0, 1.0]], columns=["a", "b"])
+    log_var = pd.DataFrame([[0.0, np.log(9.0)]], columns=["a", "b"])
+
+    def fake_predict_tensors(X, context=None):
+        import torch
+
+        return (
+            torch.tensor(target.values, dtype=torch.float32),
+            torch.tensor(mu.values, dtype=torch.float32),
+            torch.tensor(log_var.values, dtype=torch.float32),
+        )
+
+    monkeypatch.setattr(model, "_predict_tensors", fake_predict_tensors)
+
+    score = model.predict(target)
+
+    expected_components = 0.5 * (
+        log_var.values + ((target.values - mu.values) ** 2) / np.exp(log_var.values)
+    )
+    assert np.allclose(score, expected_components.mean(axis=1))

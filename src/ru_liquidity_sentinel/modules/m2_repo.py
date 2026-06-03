@@ -1,4 +1,4 @@
-"""Module M2 — CBR repo auctions."""
+"""M2 feature builder: Bank of Russia repo auctions."""
 
 from __future__ import annotations
 
@@ -11,7 +11,9 @@ from ..normalize import (
     robust_online_cusum_series,
 )
 
+
 PRIMARY_TERM_DAYS = 7.0
+
 
 def build_m2(
     repo_auctions: pd.DataFrame,
@@ -19,7 +21,7 @@ def build_m2(
     calendar: pd.DatetimeIndex,
     mad_window_days: int,
 ) -> pd.DataFrame:
-    """Construct the M2 daily feature frame (no smoothing, strictly per TZ)."""
+    """Build daily M2 features from repo-auction and key-rate data."""
 
     df = repo_auctions.copy()
 
@@ -39,14 +41,18 @@ def build_m2(
     daily_repo["weighted_avg_rate_pct"] = np.where(
         daily_repo["allotment_mlnrub"] > 0,
         daily_repo["weighted_rate_sum"] / daily_repo["allotment_mlnrub"],
-        daily_repo["simple_rate_mean"]
+        daily_repo["simple_rate_mean"],
     )
 
-    daily_repo["cover_ratio"] = pd.Series(np.where(
-        (daily_repo["allotment_mlnrub"] == 0) & (daily_repo["demand_volume_mlnrub"] > 0),
-        99.0,
-        daily_repo["demand_volume_mlnrub"] / daily_repo["allotment_mlnrub"].replace(0.0, np.nan)
-    )).fillna(0.0).values
+    daily_repo["cover_ratio"] = pd.Series(
+        np.where(
+            (daily_repo["allotment_mlnrub"] == 0)
+            & (daily_repo["demand_volume_mlnrub"] > 0),
+            99.0,
+            daily_repo["demand_volume_mlnrub"]
+            / daily_repo["allotment_mlnrub"].replace(0.0, np.nan),
+        )
+    ).fillna(0.0).values
 
     primary = (
         daily_repo[daily_repo["term_days"] == PRIMARY_TERM_DAYS]

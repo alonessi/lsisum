@@ -1,31 +1,7 @@
-"""Module M4 — Tax-period seasonality (TZ output: mad_score + flags + MIO).
-
-The user provided a refreshed dataset (``m4_tax_calendar.csv``,
-``m4_tax_flags_daily.csv``) that now spans 2014–2026 and ships full
-``events_count`` / ``titles`` for the entire calendar (the previous
-file only had populated events from 2021 on).
-
-Per the TZ, M4 is the *seasonality* module.  We expose:
-
-* a MAD-based robust z-score for the **events count** — captures
-  "unusually busy tax days" without baking the multiplier into the
-  module output;
-* the original boolean tax-peak / EoM / EoQ / EoY flags from the
-  parsed daily file;
-* an aggregate intensity flag ``m4_flag_tax_week`` (peak ±2 days);
-* the **MIO** :class:`RobustOnlineCUSUM` accumulator on the events
-  count;
-* the multiplicative ``m4_seasonal_factor`` ∈ ``[1.0, 1.4]`` (kept as
-  a derived feature, no longer applied implicitly inside aggregator).
-
-NOTE: there is **no smoothing**.  The ``flag_has_event`` and ``dom``
-columns are passed through as-is and the events-count distribution
-is winsorised with the rolling-quantile helper instead of an EWMA.
-"""
+"""M4 feature builder: tax-calendar seasonality."""
 
 from __future__ import annotations
 
-import numpy as np
 import pandas as pd
 
 from ..normalize import (
@@ -35,27 +11,13 @@ from ..normalize import (
 )
 
 
-PEAK_COLS = [
-    "flag_tax_peak_15",
-    "flag_tax_peak_20",
-    "flag_tax_peak_25",
-    "flag_tax_peak_28",
-]
-
-CAL_COLS = [
-    "flag_end_of_month",
-    "flag_quarter_end",
-    "flag_year_end",
-]
-
-
 def build_m4(
     tax_flags_daily: pd.DataFrame,
     calendar: pd.DatetimeIndex,
     mad_window_days: int = 365 * 3,
     factor_max: float = 1.4,
 ) -> pd.DataFrame:
-    """Construct the M4 daily feature frame (TZ output: mad + flags + MIO)."""
+    """Build daily M4 seasonality features from tax-calendar flags."""
 
     df = tax_flags_daily.copy().set_index("date").sort_index()
 
@@ -80,17 +42,19 @@ def build_m4(
         else:
             out[dst] = pd.Series(0, index=calendar, dtype="int8")
 
-    base_peak = (
-        out[
-            [
-                "m4_flag_tax_peak_15",
-                "m4_flag_tax_peak_20",
-                "m4_flag_tax_peak_25",
-                "m4_flag_tax_peak_28",
-            ]
-        ].sum(axis=1)
-        > 0
-    ).astype("int8")
+    peak_cols = [
+        "m4_flag_tax_peak_15",
+        "m4_flag_tax_peak_20",
+        "m4_flag_tax_peak_25",
+        "m4_flag_tax_peak_28",
+    ]
+    calendar_cols = [
+        "m4_flag_end_of_month",
+        "m4_flag_quarter_end",
+        "m4_flag_year_end",
+    ]
+
+    base_peak = (out[peak_cols].sum(axis=1) > 0).astype("int8")
     rolling_peak = base_peak.rolling(window=5, center=True, min_periods=1).max()
     out["m4_flag_tax_week"] = rolling_peak.fillna(0).astype("int8")
 
@@ -107,22 +71,8 @@ def build_m4(
     )
 
     intensity = (
-        out[
-            [
-                "m4_flag_tax_peak_15",
-                "m4_flag_tax_peak_20",
-                "m4_flag_tax_peak_25",
-                "m4_flag_tax_peak_28",
-            ]
-        ].sum(axis=1)
-        + 0.5
-        * out[
-            [
-                "m4_flag_end_of_month",
-                "m4_flag_quarter_end",
-                "m4_flag_year_end",
-            ]
-        ].sum(axis=1)
+        out[peak_cols].sum(axis=1)
+        + 0.5 * out[calendar_cols].sum(axis=1)
         + out["m4_flag_tax_week"].astype(int)
     ).clip(lower=0)
     if intensity.max() > 0:

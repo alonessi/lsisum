@@ -1,28 +1,4 @@
-"""MAD-based normalisation helpers.
-
-The TZ requires a robust normalisation of every signal using MAD
-(median absolute deviation) over a 3-year rolling window.  The classic
-robust z-score formula is used::
-
-    score = (x - median) / (1.4826 * MAD)
-
-For empty / degenerate windows the score is set to ``0`` (i.e. the
-signal is treated as neutral when not enough history is available).
-
-Two convenience helpers are also provided here:
-
-* ``mad_zscore_to_subindex`` — squashes a robust z-score into the
-  ``[0, 100]`` interval using a logistic transform so it can be used as
-  a stress sub-index directly.
-* ``align_to_calendar`` — utility that re-indexes a sparse series to a
-  daily calendar with forward-fill semantics.
-
-In addition to the rolling-MAD layer, this module exposes the
-``RobustOnlineCUSUM`` detector and the convenience wrapper
-``robust_online_cusum_series`` that applies it to a daily series.
-This is the **MIO** signal — a strictly online, look-ahead-free
-stress accumulator that the user requested for every module.
-"""
+"""Robust normalisation helpers for daily liquidity signals."""
 
 from __future__ import annotations
 
@@ -41,24 +17,7 @@ def rolling_mad_zscore(
     min_periods: int = 30,
     direction: str = "two-sided",
 ) -> pd.Series:
-    """Robust z-score with rolling median and MAD.
-
-    Parameters
-    ----------
-    series:
-        Input series indexed by ``DatetimeIndex``.
-    window_days:
-        Rolling window size in calendar days.
-    min_periods:
-        Minimum number of observations inside the window required to
-        produce a non-null score.
-    direction:
-        ``"two-sided"`` returns the signed z-score, ``"upper"`` clips
-        negative values to zero (we only care about the stressed tail
-        of a signal — e.g. high cover ratio for repo, large positive
-        spread for reserves), ``"lower"`` clips positive values to
-        zero (e.g. cover ratio for OFZ where *low* values mean stress).
-    """
+    """Calculate a rolling robust z-score using median absolute deviation."""
 
     if not isinstance(series.index, pd.DatetimeIndex):
         raise TypeError("Series must be indexed by a DatetimeIndex")
@@ -87,16 +46,7 @@ def rolling_mad_zscore(
 
 
 def zscore_to_subindex(zscore: pd.Series, scale: float = 1.0) -> pd.Series:
-    """Map a robust z-score to ``[0, 100]`` using a logistic squashing.
-
-    ``scale`` controls the slope: a smaller value makes the squashing
-    more aggressive.  With the default ``scale=1`` a z-score of ``2``
-    MAD-standard deviations maps to roughly 76, ``3`` to roughly 90,
-    ``4`` to roughly 96.  Negative z-scores produce values below 50 —
-    for one-sided signals (``direction="upper"`` / ``"lower"``) they
-    are clipped at 0 before being passed in, so the sub-index sits in
-    ``[50, 100]`` and is then re-centred to ``[0, 100]``.
-    """
+    """Map a robust z-score to a bounded ``[0, 100]`` sub-index."""
 
     zscore = zscore.astype(float)
     sub = 100.0 / (1.0 + np.exp(-zscore / scale))
@@ -111,16 +61,7 @@ def smooth_ewma(
     halflife_days: float = 7.0,
     min_periods: int = 1,
 ) -> pd.Series:
-    """Time-aware exponential smoothing with a half-life in calendar days.
-
-    The TZ-driven sub-indices and the final LSI are noisy because each
-    of the underlying sources publishes at its own (irregular) cadence
-    — repo auctions twice a week, OFZ auctions weekly, treasury data
-    monthly.  Forward-filling those values onto a daily calendar
-    creates step-like artefacts.  An EWMA with a half-life of ~1 week
-    visibly smooths the daily series without introducing any look-
-    ahead (the kernel is strictly causal).
-    """
+    """Apply causal time-aware EWMA smoothing."""
 
     if not isinstance(series.index, pd.DatetimeIndex):
         raise TypeError("Series must be indexed by a DatetimeIndex")
@@ -139,15 +80,7 @@ def rolling_percentile_rank(
     window_days: int,
     min_periods: int = 60,
 ) -> pd.Series:
-    """Rolling empirical-CDF percentile rank in ``[0, 100]``.
-
-    For each date ``t`` returns the percentage of observations in
-    ``(t - window_days, t]`` that are *strictly below* the current
-    value (i.e. an empirical CDF lookup).  This produces a stationary,
-    bounded series suitable for the final LSI calibration: a rank of
-    95 means "today is more stressful than 95% of the last
-    ``window_days`` days".
-    """
+    """Calculate rolling empirical-CDF percentile rank in ``[0, 100]``."""
 
     if not isinstance(series.index, pd.DatetimeIndex):
         raise TypeError("Series must be indexed by a DatetimeIndex")
@@ -176,16 +109,7 @@ def winsorize_rolling(
     upper_q: float = 0.995,
     min_periods: int = 30,
 ) -> pd.Series:
-    """Causal rolling winsorisation at the upper quantile ``upper_q``.
-
-    Replaces any value that exceeds the rolling ``upper_q``-quantile in
-    ``(t - window_days, t]`` with that quantile.  Uses only past data,
-    so there is no look-ahead.  Driven by EDA findings: a handful of
-    raw inputs (M3 OFZ ``cover_ratio``, ``demand_volume_mlnrub``;
-    M1 ``spread_blnrub``) have extreme right tails (skew > 5,
-    kurtosis > 50, p99/p50 > 10) where one-off events would otherwise
-    dominate the rolling MAD window for years afterwards.
-    """
+    """Cap observations at a causal rolling upper quantile."""
 
     if not isinstance(series.index, pd.DatetimeIndex):
         raise TypeError("Series must be indexed by a DatetimeIndex")
@@ -204,12 +128,7 @@ def align_to_calendar(
     method: str = "ffill",
     fill_value: float | None = None,
 ) -> pd.Series:
-    """Reindex a sparse series onto a daily calendar with ``ffill``.
-
-    ``method='ffill'`` forward-fills the last known value (suitable for
-    monthly / weekly data such as reserves or OFZ auctions).  Pass
-    ``fill_value=0`` to encode "no event today".
-    """
+    """Reindex a sparse series onto the daily modelling calendar."""
 
     s = series.copy()
     if not isinstance(s.index, pd.DatetimeIndex):
@@ -225,32 +144,7 @@ def align_to_calendar(
 
 
 class RobustOnlineCUSUM:
-    """Robust online CUSUM detector with cooldown ("MIO" feature).
-
-    Provided by the user.  Strictly causal: at each step ``t`` the
-    rolling median / MAD are computed on history ``[t - window_size, t)``
-    (i.e. *before* observing ``current_value``).  The output is in
-    ``[0, 1]`` so it can be fed into the NSVM aggregator as a
-    stationary feature without re-scaling.
-
-    Parameters
-    ----------
-    window_size:
-        Rolling window length in *observations* (the TZ asks for
-        ~3 years ≈ 756 trading days).
-    threshold:
-        Maximum accumulated stress used to normalise the output to
-        ``[0, 1]``.  A higher threshold makes the detector less
-        sensitive.
-    drift:
-        Slack term (in robust z-units).  CUSUM only grows when the
-        z-score exceeds ``drift`` — gates out small fluctuations.
-    cooldown_factor:
-        How quickly the accumulator decays when the signal returns to
-        / below the median.  ``0.0`` instantly resets, ``1.0`` keeps
-        the accumulator forever (pure CUSUM).  Default ``0.5`` halves
-        on each calm step.
-    """
+    """Causal robust CUSUM detector with bounded output."""
 
     def __init__(
         self,
@@ -295,11 +189,7 @@ def robust_online_cusum_series(
     drift: float = 1.0,
     cooldown_factor: float = 0.5,
 ) -> pd.Series:
-    """Run :class:`RobustOnlineCUSUM` over a pandas Series.
-
-    NaNs are passed through (output 0 for missing observations) so
-    that masked / not-yet-published days do not poison the detector.
-    """
+    """Run :class:`RobustOnlineCUSUM` over a pandas Series."""
 
     if not isinstance(series.index, pd.DatetimeIndex):
         raise TypeError("Series must be indexed by a DatetimeIndex")

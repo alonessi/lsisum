@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, Tuple
 
 import numpy as np
 import pandas as pd
@@ -17,21 +17,27 @@ except ImportError:
 
 @dataclass
 class ECDFCalibration:
-    """Empirical CDF calibrator that maps raw anomaly scores to percentile rank."""
+    """Empirical CDF calibrator with calm and stressed quantile anchors."""
 
     train_scores: np.ndarray
+    q_low: float = 0.20
+    q_high: float = 0.995
 
     @classmethod
     def fit(
         cls,
         train_raw: np.ndarray,
+        q_low: float = 0.20,
+        q_high: float = 0.995,
         **kwargs,
     ) -> "ECDFCalibration":
+        if not 0.0 <= q_low < q_high <= 1.0:
+            raise ValueError("Expected quantiles to satisfy 0 <= q_low < q_high <= 1")
         arr = np.asarray(train_raw, dtype=float)
         arr = arr[np.isfinite(arr)]
         if arr.size == 0:
             arr = np.array([0.0])
-        return cls(train_scores=np.sort(arr))
+        return cls(train_scores=np.sort(arr), q_low=q_low, q_high=q_high)
 
     def transform(self, raw: np.ndarray) -> np.ndarray:
         arr = np.asarray(raw, dtype=float)
@@ -41,11 +47,22 @@ class ECDFCalibration:
         rank_lo = np.searchsorted(self.train_scores, arr, side="left")
         rank_hi = np.searchsorted(self.train_scores, arr, side="right")
         percentile = (rank_lo + rank_hi) / 2.0 / self.train_scores.size
-        return np.clip(percentile * 100.0, 0.0, 100.0)
+
+        q_low = float(getattr(self, "q_low", 0.20))
+        q_high = float(getattr(self, "q_high", 0.995))
+        if not 0.0 <= q_low < q_high <= 1.0:
+            q_low, q_high = 0.20, 0.995
+
+        scaled = (percentile - q_low) / (q_high - q_low)
+        return np.clip(scaled * 100.0, 0.0, 100.0)
 
 
-def shap_module_attribution(model: Any, X: pd.DataFrame, feature_to_module: Dict[str, str],
-                            lsi: pd.Series) -> pd.DataFrame:
+def estimate_module_attribution(
+    model: Any,
+    X: pd.DataFrame,
+    feature_to_module: Dict[str, str],
+    lsi: pd.Series,
+) -> pd.DataFrame:
     """Estimate module shares from analytical NLL components or SHAP values."""
 
     canonical_modules = ("M1", "M2", "M3", "M4", "M5")
@@ -57,16 +74,13 @@ def shap_module_attribution(model: Any, X: pd.DataFrame, feature_to_module: Dict
         out[f"contrib_{module}"] = 0.0
 
     try:
-        if hasattr(model, 'get_nll_components'):
-            nll_components = model.get_nll_components(X)
-            shap_arr = np.abs(nll_components)
+        if hasattr(model, "get_nll_components"):
+            attribution_arr = np.abs(model.get_nll_components(X))
         else:
             explainer = _shap.TreeExplainer(model)
             shap_values = explainer.shap_values(X)
-            shap_arr = np.abs(np.asarray(shap_values, dtype=float))
-
-    except Exception as e:
-        print(f"\n!!! ОШИБКА АТРИБУЦИИ !!! : {e}\n")
+            attribution_arr = np.abs(np.asarray(shap_values, dtype=float))
+    except Exception:
         present = {feature_to_module.get(c) for c in X.columns}
         present = {m for m in present if m in canonical_modules}
         if present:
@@ -80,45 +94,59 @@ def shap_module_attribution(model: Any, X: pd.DataFrame, feature_to_module: Dict
     module_idx = {m: [] for m in canonical_modules}
 
     for i, col in enumerate(feature_cols):
-        m = feature_to_module.get(col, "OTHER")
-        if m in module_idx:
-            module_idx[m].append(i)
+        module = feature_to_module.get(col, "OTHER")
+        if module in module_idx:
+            module_idx[module].append(i)
 
-    total_abs = shap_arr.sum(axis=1)
+    total_abs = attribution_arr.sum(axis=1)
     total_abs_safe = np.where(total_abs < 1e-12, 1.0, total_abs)
 
     for module in canonical_modules:
         idx = module_idx[module]
         if not idx:
             continue
-        sumsq = shap_arr[:, idx].sum(axis=1)
-        share = sumsq / total_abs_safe
+        module_abs = attribution_arr[:, idx].sum(axis=1)
+        share = module_abs / total_abs_safe
         out[f"share_{module}"] = share
         out[f"contrib_{module}"] = share * out["dsm_anomaly"].values
 
     return out
 
 
-def nsvm_lsi(model: Any, X_full: pd.DataFrame, train_idx: pd.Index, feature_to_module: Dict[str, str],
-             q_low: float = 0.10, q_high: float = 0.99) -> Tuple[pd.Series, pd.DataFrame, ECDFCalibration]:
-    """Build ECDF-calibrated LSI and module attribution for a fitted NSVM."""
+shap_module_attribution = estimate_module_attribution
+
+
+def nsvm_lsi(
+    model: Any,
+    X_full: pd.DataFrame,
+    train_idx: pd.Index,
+    feature_to_module: Dict[str, str],
+    q_low: float = 0.20,
+    q_high: float = 0.995,
+) -> Tuple[pd.Series, pd.DataFrame, ECDFCalibration]:
+    """Build an ECDF-calibrated LSI series and module attribution."""
 
     raw_full = pd.Series(model.predict(X_full), index=X_full.index)
 
-    seq_len = getattr(model, 'seq_len', 14)
+    seq_len = getattr(model, "seq_len", 14)
     if len(raw_full) > seq_len:
         raw_full.iloc[:seq_len] = np.nan
 
     raw_full = raw_full.ewm(span=7, adjust=False).mean()
 
     raw_train = raw_full.loc[raw_full.index.intersection(train_idx)].dropna().values
-    cal = ECDFCalibration.fit(raw_train)
+    cal = ECDFCalibration.fit(raw_train, q_low=q_low, q_high=q_high)
 
     lsi_arr = cal.transform(raw_full.bfill().ffill().values)
     lsi = pd.Series(lsi_arr, index=X_full.index, name="nsvm_lsi")
 
-    attr = shap_module_attribution(model, X_full, feature_to_module, lsi)
+    attr = estimate_module_attribution(model, X_full, feature_to_module, lsi)
     return lsi, attr, cal
 
 
-__all__ = ["ECDFCalibration", "nsvm_lsi", "shap_module_attribution"]
+__all__ = [
+    "ECDFCalibration",
+    "nsvm_lsi",
+    "estimate_module_attribution",
+    "shap_module_attribution",
+]

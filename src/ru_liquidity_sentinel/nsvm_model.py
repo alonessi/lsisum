@@ -144,17 +144,22 @@ class NSVMAnomalyDetector(BaseEstimator):
         X: pd.DataFrame | np.ndarray,
         context: pd.DataFrame | np.ndarray | None = None,
     ) -> np.ndarray:
-        target_tensor, mu, _log_var = self._predict_tensors(X, context=context)
-        mae = torch.mean(torch.abs(target_tensor - mu), dim=1)
-        return mae.cpu().numpy()
+        target_tensor, mu, log_var = self._predict_tensors(X, context=context)
+        log_var = torch.clamp(log_var, min=-4.0, max=4.0)
+        var = torch.exp(log_var)
+        nll = 0.5 * (log_var + ((target_tensor - mu) ** 2) / var)
+        return torch.mean(nll, dim=1).cpu().numpy()
 
     def get_nll_components(
         self,
         X: pd.DataFrame | np.ndarray,
         context: pd.DataFrame | np.ndarray | None = None,
     ) -> np.ndarray:
-        target_tensor, mu, _log_var = self._predict_tensors(X, context=context)
-        return torch.abs(target_tensor - mu).cpu().numpy()
+        target_tensor, mu, log_var = self._predict_tensors(X, context=context)
+        log_var = torch.clamp(log_var, min=-4.0, max=4.0)
+        var = torch.exp(log_var)
+        nll = 0.5 * (log_var + ((target_tensor - mu) ** 2) / var)
+        return nll.cpu().numpy()
 
     def partial_fit(
         self,
