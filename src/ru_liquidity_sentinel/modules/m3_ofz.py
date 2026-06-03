@@ -47,7 +47,7 @@ def build_m3(
     )
 
     rolling_med = out["m3_yield_pct"].rolling("60D", min_periods=10).median()
-    out["m3_yield_spread_pct"] = (out["m3_yield_pct"] - rolling_med).fillna(0.0)
+    out["m3_yield_spread_pct"] = (out["m3_yield_pct"] - rolling_med)
 
     out["m3_mad_cover_low"] = rolling_mad_zscore(
         out["m3_cover_ratio"], window_days=mad_window_days, direction="lower"

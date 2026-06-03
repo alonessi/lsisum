@@ -243,30 +243,25 @@ def adaptive_model_update(models, new_features):
     actual_model = res.model
     train_features = res.feature_cols
 
-    # Берем последние 30 дней датасета для проверки на смена режима
-    X_adaptation = new_features[train_features].tail(30).fillna(0.0)
+    # ---> ИСПРАВЛЕНИЕ <---
+    # Берем 30 дней + seq_len дней контекста!
+    seq_len = getattr(actual_model, 'seq_len', 14)
+    # Берем 30 дней для обучения + 14 дней контекста, чтобы LSTM было от чего оттолкнуться
+    X_adaptation = new_features[train_features].tail(30 + seq_len).fillna(0.0)
 
-    current_nll_scores = actual_model.predict(X_adaptation)
+    # А вот проверять порог (NLL) продолжаем строго на последних 30 днях
+    X_check = new_features[train_features].tail(30).fillna(0.0)
+    current_nll_scores = actual_model.predict(X_check)
     current_mean_nll = np.mean(current_nll_scores)
 
     cv_nll = res.train_metrics.get("mean_nll", -1.0)
-
-    # -------------------------------------------------------------
-    # ИСПРАВЛЕНИЕ 1: Корректный расчет порога для отрицательных лоссов.
-    # Прибавляем 50% от модуля значения.
-    # Если cv_nll = -2.0, порог станет -1.0 (то есть "хуже/выше")
-    # -------------------------------------------------------------
     threshold = cv_nll + abs(cv_nll) * 0.5
 
     if current_mean_nll > threshold:
         print(f"⚠️ ВНИМАНИЕ: Смена рыночного режима! Текущий NLL: {current_mean_nll:.2f} (Порог: {threshold:.2f})")
         print("⏳ Запуск unsupervised дообучения (partial_fit)...")
         try:
-            # -------------------------------------------------------------
-            # ИСПРАВЛЕНИЕ 2: Микро-дозирование обучения (Micro-dosing).
-            # Снижаем агрессию дообучения, чтобы не стереть историческую память.
-            # 2 эпохи вместо 7, learning_rate = 1e-5 вместо 1e-4.
-            # -------------------------------------------------------------
+            # Модель "проглотит" контекст и обновит веса только на честных данных
             actual_model.partial_fit(X_adaptation, epochs=2, lr=1e-5)
             print("✅ Веса NSVM обновлены.")
         except Exception as e:

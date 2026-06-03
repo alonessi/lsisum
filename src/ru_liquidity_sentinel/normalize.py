@@ -81,6 +81,9 @@ def rolling_mad_zscore(
     elif direction != "two-sided":
         raise ValueError(f"Unknown direction: {direction}")
 
+    # ---> СУПЕР-ФИКС: Ограничение градиентных взрывов <---
+    zscore = zscore.clip(lower=-15.0, upper=15.0)
+
     return zscore.fillna(0.0)
 
 

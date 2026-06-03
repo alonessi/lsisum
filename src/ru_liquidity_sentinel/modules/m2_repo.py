@@ -75,7 +75,7 @@ def build_m2(
 
     # Fill daily series
     out["m2_cover_ratio"] = align_to_calendar(
-        primary_cover, calendar, method="ffill", fill_value=0.0
+        primary_cover, calendar, method="ffill"
     )
     out["m2_rate_pct"] = align_to_calendar(primary_rate, calendar, method="ffill")
     out["m2_rate_spread_pct"] = (out["m2_rate_pct"] - keyrate_aligned).fillna(0.0)

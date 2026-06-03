@@ -106,15 +106,26 @@ def gbm_lsi(model: Any, X_full: pd.DataFrame, train_idx: pd.Index, feature_to_mo
     # 1. Получаем сырой NLL по всей истории
     raw_full = pd.Series(model.predict(X_full), index=X_full.index)
 
+    # ---> ЗАЩИТА ОТ BURN-IN <---
+    # Первые seq_len дней - это мусор из-за нулевого паддинга, вырезаем их
+    seq_len = getattr(model, 'seq_len', 14)
+    if len(raw_full) > seq_len:
+        raw_full.iloc[:seq_len] = np.nan
+
     # 2. Сглаживаем шум прогнозирования (EMA span=7 дней) ДО калибровки
     raw_full = raw_full.ewm(span=7, adjust=False).mean()
 
     # 3. Калибруем уже сглаженный сигнал ранговым методом
-    raw_train = raw_full.loc[raw_full.index.intersection(train_idx)].values
+    # Убираем NaN перед фитом, чтобы калибратор видел только честные данные
+    raw_train = raw_full.loc[raw_full.index.intersection(train_idx)].dropna().values
     cal = ECDFCalibration.fit(raw_train)
 
-    lsi_arr = cal.transform(raw_full.values)
+    # Безопасно применяем transform
+    lsi_arr = cal.transform(raw_full.fillna(0.0).values)
     lsi = pd.Series(lsi_arr, index=X_full.index, name="gbm_lsi")
+
+    # Жестко обнуляем начало LSI, чтобы на графиках не было "призрачного" стресса
+    lsi.iloc[:seq_len] = 0.0
 
     attr = shap_module_attribution(model, X_full, feature_to_module, lsi)
     return lsi, attr, cal

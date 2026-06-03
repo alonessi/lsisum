@@ -67,7 +67,12 @@ class NSVMAnomalyDetector(BaseEstimator):
         if isinstance(X, pd.DataFrame): X = X.values
 
         X_tensor = self._create_sequences(X)
-        target_tensor = torch.tensor(X, dtype=torch.float32)  # Истинный X_t
+        target_tensor = torch.tensor(X, dtype=torch.float32)
+
+        # ---> ИСПРАВЛЕНИЕ <---
+        if len(X_tensor) > self.seq_len:
+            X_tensor = X_tensor[self.seq_len:]
+            target_tensor = target_tensor[self.seq_len:]
 
         dataset = TensorDataset(X_tensor, target_tensor)
         loader = DataLoader(dataset, batch_size=self.batch_size, shuffle=True)
@@ -131,6 +136,14 @@ class NSVMAnomalyDetector(BaseEstimator):
         if isinstance(X, pd.DataFrame): X = X.values
         X_tensor = self._create_sequences(X)
         target_tensor = torch.tensor(X, dtype=torch.float32)
+
+        # ---> СУПЕР-ФИКС: Отрезаем мусорный паддинг из обучения <---
+        if len(X_tensor) > self.seq_len:
+            X_tensor = X_tensor[self.seq_len:]
+            target_tensor = target_tensor[self.seq_len:]
+
+        dataset = TensorDataset(X_tensor, target_tensor)
+        loader = DataLoader(dataset, batch_size=self.batch_size, shuffle=True)
 
         dataset = TensorDataset(X_tensor, target_tensor)
         loader = DataLoader(dataset, batch_size=self.batch_size, shuffle=True)

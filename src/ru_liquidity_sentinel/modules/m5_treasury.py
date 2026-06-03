@@ -48,14 +48,14 @@ def build_m5(
     for src, dst in _BL_COLUMN_MAP:
         if src in bl.columns:
             out[dst] = align_to_calendar(
-                bl[src], calendar, method="ffill", fill_value=0.0
+                bl[src], calendar, method="ffill"
             )
         else:
-            out[dst] = 0.0
+            out[dst] = np.nan
 
     out[["m5_flag_budget_drain", "m5_flag_budget_drain_strong"]] = out[
         ["m5_flag_budget_drain", "m5_flag_budget_drain_strong"]
-    ].astype("int8")
+    ].fillna(0).astype("int8")
 
     # MAD based on the treasury 5-day delta drain (lower values = larger drain)
     out["m5_mad_treasury_drain"] = rolling_mad_zscore(
@@ -71,7 +71,7 @@ def build_m5(
         if "volume_placed_blnrub" in rk.columns
         else rk.get("n_documents", pd.Series(dtype=float))
     )
-    rk_vol = align_to_calendar(rk_col, calendar, method="ffill", fill_value=0.0)
+    rk_vol = align_to_calendar(rk_col, calendar, method="ffill")
 
     rk_delta_5d = rk_vol.diff(periods=5).fillna(0.0)
     out["m5_roskazna_delta_5d_blnrub"] = rk_delta_5d
