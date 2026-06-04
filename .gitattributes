@@ -1,0 +1,3 @@
+parsers/data/raw/** linguist-vendored
+data/raw/** linguist-vendored
+artifacts/** linguist-generated
